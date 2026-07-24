@@ -1,0 +1,16 @@
+{
+  "comment": "Paste into Cursor/Claude MCP config. Point args at this repo's stdio_server.py.",
+  "mcpServers": {
+    "organism-continuity": {
+      "command": "python3",
+      "args": ["./stdio_server.py"]
+    }
+  },
+  "cli_smoke": [
+    "python3 server.py list-tools",
+    "python3 server.py call preflight",
+    "python3 server.py call dual_lane_pending",
+    "python3 server.py call send_key_map",
+    "python3 server.py call ocarina_doctrine"
+  ]
+}
