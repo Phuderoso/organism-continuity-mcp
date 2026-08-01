@@ -1,0 +1,23 @@
+{
+  "comment": "Paste into Cursor/Claude MCP config. Adjust workspace path if needed.",
+  "mcpServers": {
+    "organism-power": {
+      "command": "python3",
+      "args": [
+        "/Users/lime/.openclaw/workspace/tools/mcp_organism_power/stdio_server.py"
+      ]
+    },
+    "organism-continuity": {
+      "command": "python3",
+      "args": [
+        "/Users/lime/.openclaw/workspace/tools/mcp_organism_continuity/stdio_server.py"
+      ]
+    }
+  },
+  "cli_smoke": [
+    "python3 tools/mcp_organism_power/server.py list-tools",
+    "python3 tools/mcp_organism_power/server.py call fts_status",
+    "python3 tools/mcp_organism_power/server.py call recall --query 'dual-lane' --limit 5",
+    "python3 tools/mcp_organism_continuity/server.py call peer_starter"
+  ]
+}
