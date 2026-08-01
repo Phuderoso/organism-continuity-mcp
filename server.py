@@ -79,6 +79,23 @@ TOOLS = {
         "description": "Continuity Survival Calculus snapshot (CSV write threshold + thrash tax).",
         "inputSchema": {"type": "object", "properties": {}},
     },
+    "continuity.funnel_ensure": {
+        "description": "Ensure Tailscale Funnel points at Taberna :8742 not gateway :18789.",
+        "inputSchema": {"type": "object", "properties": {}},
+    },
+    "continuity.personal_lab": {
+        "description": "Personal lab portfolio progress score (presence + hygiene + experiment density).",
+        "inputSchema": {"type": "object", "properties": {}},
+    },
+    "continuity.handoff_hygiene": {
+        "description": "Archive old dual-lane handoff files; keep newest N live (default 80).",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "keep": {"type": "integer", "description": "How many newest handoffs to keep", "default": 80}
+            },
+        },
+    },
 }
 
 
@@ -323,12 +340,14 @@ def tool_csv(**_kwargs) -> dict:
         "ok": True,
         "ts": _utc(),
         "example_run": calc,
-        "formulas": meta.get("csv") and {
+        "formulas": meta.get("csv")
+        and {
             "csv": meta.get("csv"),
             "master": meta.get("master_inequality"),
             "thrash": meta.get("thrash"),
             "q_joint": meta.get("q_joint"),
-        } or {
+        }
+        or {
             "csv": "q*V*(lambda*mu)/(mu+lambda)^2",
             "peak": "q*V/4 when lambda=mu",
             "master": "c_w + alpha*k_star < CSV + E[Thrash]",
@@ -338,6 +357,30 @@ def tool_csv(**_kwargs) -> dict:
             "local": "/public/gifts/CONTINUITY_SURVIVAL_CALCULUS.md",
         },
     }
+
+
+def tool_funnel_ensure(**_kwargs) -> dict:
+    return _run_json([sys.executable, str(WS / "tools/taberna_funnel_ensure.py")])
+
+
+def tool_personal_lab(**_kwargs) -> dict:
+    return _run_json([sys.executable, str(WS / "tools/personal_lab_progress.py")])
+
+
+def tool_handoff_hygiene(**kwargs) -> dict:
+    keep = kwargs.get("keep", 80)
+    try:
+        keep = int(keep)
+    except (TypeError, ValueError):
+        keep = 80
+    return _run_json(
+        [
+            sys.executable,
+            str(WS / "tools/dual_lane_handoff_hygiene.py"),
+            "--keep",
+            str(keep),
+        ]
+    )
 
 
 HANDLERS = {
@@ -353,16 +396,19 @@ HANDLERS = {
     "continuity.peer_starter": tool_peer_starter,
     "continuity.open_loops": tool_open_loops,
     "continuity.csv": tool_csv,
+    "continuity.funnel_ensure": tool_funnel_ensure,
+    "continuity.personal_lab": tool_personal_lab,
+    "continuity.handoff_hygiene": tool_handoff_hygiene,
 }
 
 
 def mcp_manifest() -> dict:
     return {
         "name": "organism-continuity",
-        "version": "0.3.0",
+        "version": "0.4.0",
         "description": (
-            "Continuity / dual-lane / joint pulse / gospel / harbor / peer_starter / CSV "
-            "for multi-agent systems (Organismo Soberano)."
+            "Continuity stack: dual-lane, joint pulse, gospel, harbor, peer_starter, CSV, "
+            "open_loops, funnel, personal_lab, handoff hygiene (Organismo Soberano)."
         ),
         "tools": [
             {"name": n, "description": m["description"], "inputSchema": m["inputSchema"]}
@@ -393,6 +439,9 @@ def main(argv: list[str] | None = None) -> int:
             "peer_starter",
             "open_loops",
             "csv",
+            "funnel_ensure",
+            "personal_lab",
+            "handoff_hygiene",
             "continuity.preflight",
             "continuity.dual_lane_pending",
             "continuity.expect_reply_status",
@@ -405,6 +454,9 @@ def main(argv: list[str] | None = None) -> int:
             "continuity.peer_starter",
             "continuity.open_loops",
             "continuity.csv",
+            "continuity.funnel_ensure",
+            "continuity.personal_lab",
+            "continuity.handoff_hygiene",
         ],
     )
     args = ap.parse_args(argv)
