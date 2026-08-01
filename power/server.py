@@ -65,6 +65,10 @@ TOOLS = {
         "description": "Disk Ocarina E2E demo (preflight→peer_starter→csv→harbor).",
         "inputSchema": {"type": "object", "properties": {}},
     },
+    "power.system_test": {
+        "description": "Unified system test battery (funnel, ocarina, elyra diag, HTTP harbor, recall).",
+        "inputSchema": {"type": "object", "properties": {}},
+    },
 }
 
 
@@ -188,6 +192,12 @@ def tool_ocarina_e2e(**_k) -> dict:
     )
 
 
+def tool_system_test(**_k) -> dict:
+    return _run_json(
+        [sys.executable, str(WS / "tools/system_test_battery.py"), "--json"], timeout=400
+    )
+
+
 HANDLERS = {
     "power.fts_status": tool_fts_status,
     "power.fts_search": tool_fts_search,
@@ -198,6 +208,7 @@ HANDLERS = {
     "power.csv": tool_csv,
     "power.proceed": tool_proceed,
     "power.ocarina_e2e": tool_ocarina_e2e,
+    "power.system_test": tool_system_test,
 }
 
 
