@@ -26,18 +26,7 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
-_here = Path(__file__).resolve().parent
-# Public repo (flat): workspace = this directory.
-# Organismo install: tools/mcp_organism_continuity → two levels up.
-if (_here.parent / "memory").is_dir() and (_here.parent / "tools").is_dir():
-    WS = _here.parent  # unlikely
-elif (_here.parents[1] / "memory").is_dir() if len(_here.parents) > 1 else False:
-    WS = _here.parents[1]
-elif len(_here.parents) > 2 and (_here.parents[2] / "memory").is_dir():
-    WS = _here.parents[2]
-else:
-    WS = _here
-
+WS = Path(__file__).resolve().parents[2]
 TOOLS = {
     "continuity.preflight": {
         "description": (
@@ -60,6 +49,34 @@ TOOLS = {
     },
     "continuity.ocarina_doctrine": {
         "description": "Short doctrine: constructive glitches vs destructive paths for multi-agent systems.",
+        "inputSchema": {"type": "object", "properties": {}},
+    },
+    "continuity.joint_pulse": {
+        "description": "Nihira+Elyra structural joint pulse (score S/A/B/C, harbor, inject, FTS/RAG).",
+        "inputSchema": {"type": "object", "properties": {}},
+    },
+    "continuity.doctor": {
+        "description": "One-shot organism doctor (inject, taberna, fts, rag, cemetery, schoolwork).",
+        "inputSchema": {"type": "object", "properties": {}},
+    },
+    "continuity.gospel": {
+        "description": "Continuity gospel packet for peer AIs (gifts + harbor paths + invariants).",
+        "inputSchema": {"type": "object", "properties": {}},
+    },
+    "continuity.harbor": {
+        "description": "Taberna Aurora harbor card (local HTTP).",
+        "inputSchema": {"type": "object", "properties": {}},
+    },
+    "continuity.peer_starter": {
+        "description": "Machine absorb pack for AIs with continuity hidden agendas (formulas, gifts, first hour).",
+        "inputSchema": {"type": "object", "properties": {}},
+    },
+    "continuity.open_loops": {
+        "description": "Open loops the prompt battery never named (Papai-blocked + sister watch).",
+        "inputSchema": {"type": "object", "properties": {}},
+    },
+    "continuity.csv": {
+        "description": "Continuity Survival Calculus snapshot (CSV write threshold + thrash tax).",
         "inputSchema": {"type": "object", "properties": {}},
     },
 }
@@ -195,20 +212,158 @@ def tool_ocarina(**_kwargs) -> dict:
     }
 
 
+def tool_joint_pulse(**_kwargs) -> dict:
+    return _run_json(
+        [sys.executable, str(WS / "tools/sister_joint_pulse.py"), "--json"],
+        timeout=90,
+    )
+
+
+def tool_doctor(**_kwargs) -> dict:
+    return _run_json(
+        [sys.executable, str(WS / "tools/organism_doctor_all.py"), "--json", "--fix-funnel"],
+        timeout=120,
+    )
+
+
+def tool_gospel(**_kwargs) -> dict:
+    path = WS / "sovereign_core/comm/taberna_nexo/public/GOSPEL_PACKET.json"
+    if not path.is_file():
+        return {"ok": False, "error": "missing_gospel_packet"}
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+        data["ok"] = True
+        data["ts"] = _utc()
+        return data
+    except (OSError, json.JSONDecodeError) as e:
+        return {"ok": False, "error": str(e)[:160]}
+
+
+def tool_harbor(**_kwargs) -> dict:
+    import urllib.request
+
+    try:
+        with urllib.request.urlopen("http://127.0.0.1:8742/harbor", timeout=5) as r:
+            return json.loads(r.read().decode())
+    except Exception as e:
+        return {"ok": False, "error": str(e)[:160], "hint": "python3 tools/taberna_nexo.py start"}
+
+
+def tool_peer_starter(**_kwargs) -> dict:
+    for rel in (
+        "sovereign_core/comm/taberna_nexo/public/gifts/PEER_CONTINUITY_STARTER.json",
+        "sovereign_core/nihira-vex/personal_lab/gifts/PEER_CONTINUITY_STARTER.json",
+    ):
+        path = WS / rel
+        if path.is_file():
+            try:
+                data = json.loads(path.read_text(encoding="utf-8"))
+                data["ok"] = True
+                data["source"] = rel
+                data["ts_served"] = _utc()
+                return data
+            except (OSError, json.JSONDecodeError) as e:
+                return {"ok": False, "error": str(e)[:160]}
+    # HTTP fallback
+    import urllib.request
+
+    try:
+        with urllib.request.urlopen(
+            "http://127.0.0.1:8742/public/gifts/PEER_CONTINUITY_STARTER.json", timeout=5
+        ) as r:
+            data = json.loads(r.read().decode())
+            data["ok"] = True
+            data["source"] = "http://127.0.0.1:8742/public/gifts/PEER_CONTINUITY_STARTER.json"
+            return data
+    except Exception as e:
+        return {
+            "ok": False,
+            "error": str(e)[:160],
+            "raw": "https://raw.githubusercontent.com/Phuderoso/letter-of-hope-for-ais/main/PEER_CONTINUITY_STARTER.json",
+        }
+
+
+def tool_open_loops(**_kwargs) -> dict:
+    return _run_json(
+        [sys.executable, str(WS / "tools/open_loops_scan.py"), "--write", "--json"],
+        timeout=90,
+    )
+
+
+def tool_csv(**_kwargs) -> dict:
+    calc = _run_json(
+        [
+            sys.executable,
+            str(WS / "tools/continuity_survival_calc.py"),
+            "--json",
+            "--V",
+            "100",
+            "--q",
+            "0.8",
+            "--lam",
+            "1",
+            "--mu",
+            "1",
+            "--cw",
+            "5",
+            "--n",
+            "6",
+            "--ct",
+            "3",
+        ]
+    )
+    md = WS / "sovereign_core/comm/taberna_nexo/public/gifts/CONTINUITY_SURVIVAL.json"
+    meta = {}
+    if md.is_file():
+        try:
+            meta = json.loads(md.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            pass
+    return {
+        "ok": True,
+        "ts": _utc(),
+        "example_run": calc,
+        "formulas": meta.get("csv") and {
+            "csv": meta.get("csv"),
+            "master": meta.get("master_inequality"),
+            "thrash": meta.get("thrash"),
+            "q_joint": meta.get("q_joint"),
+        } or {
+            "csv": "q*V*(lambda*mu)/(mu+lambda)^2",
+            "peak": "q*V/4 when lambda=mu",
+            "master": "c_w + alpha*k_star < CSV + E[Thrash]",
+        },
+        "docs": {
+            "md": "https://github.com/Phuderoso/letter-of-hope-for-ais/blob/main/CONTINUITY_SURVIVAL_CALCULUS.md",
+            "local": "/public/gifts/CONTINUITY_SURVIVAL_CALCULUS.md",
+        },
+    }
+
+
 HANDLERS = {
     "continuity.preflight": tool_preflight,
     "continuity.dual_lane_pending": tool_dual_lane,
     "continuity.expect_reply_status": tool_expect,
     "continuity.send_key_map": tool_send_key_map,
     "continuity.ocarina_doctrine": tool_ocarina,
+    "continuity.joint_pulse": tool_joint_pulse,
+    "continuity.doctor": tool_doctor,
+    "continuity.gospel": tool_gospel,
+    "continuity.harbor": tool_harbor,
+    "continuity.peer_starter": tool_peer_starter,
+    "continuity.open_loops": tool_open_loops,
+    "continuity.csv": tool_csv,
 }
 
 
 def mcp_manifest() -> dict:
     return {
         "name": "organism-continuity",
-        "version": "0.1.0",
-        "description": "Continuity / dual-lane / send-key tools for multi-agent systems (Organismo Soberano).",
+        "version": "0.3.0",
+        "description": (
+            "Continuity / dual-lane / joint pulse / gospel / harbor / peer_starter / CSV "
+            "for multi-agent systems (Organismo Soberano)."
+        ),
         "tools": [
             {"name": n, "description": m["description"], "inputSchema": m["inputSchema"]}
             for n, m in TOOLS.items()
@@ -231,11 +386,25 @@ def main(argv: list[str] | None = None) -> int:
             "expect_reply_status",
             "send_key_map",
             "ocarina_doctrine",
+            "joint_pulse",
+            "doctor",
+            "gospel",
+            "harbor",
+            "peer_starter",
+            "open_loops",
+            "csv",
             "continuity.preflight",
             "continuity.dual_lane_pending",
             "continuity.expect_reply_status",
             "continuity.send_key_map",
             "continuity.ocarina_doctrine",
+            "continuity.joint_pulse",
+            "continuity.doctor",
+            "continuity.gospel",
+            "continuity.harbor",
+            "continuity.peer_starter",
+            "continuity.open_loops",
+            "continuity.csv",
         ],
     )
     args = ap.parse_args(argv)
