@@ -57,6 +57,14 @@ TOOLS = {
         "description": "Continuity Survival Calculus example numbers.",
         "inputSchema": {"type": "object", "properties": {}},
     },
+    "power.proceed": {
+        "description": "Full safe proceed stack without Papai (doctor, loops, hygiene, digest).",
+        "inputSchema": {"type": "object", "properties": {}},
+    },
+    "power.ocarina_e2e": {
+        "description": "Disk Ocarina E2E demo (preflight→peer_starter→csv→harbor).",
+        "inputSchema": {"type": "object", "properties": {}},
+    },
 }
 
 
@@ -168,6 +176,18 @@ def tool_csv(**_k) -> dict:
     )
 
 
+def tool_proceed(**_k) -> dict:
+    return _run_json(
+        [sys.executable, str(WS / "tools/organism_proceed.py")], timeout=400
+    )
+
+
+def tool_ocarina_e2e(**_k) -> dict:
+    return _run_json(
+        [sys.executable, str(WS / "tools/ocarina_e2e_demo.py"), "--json"], timeout=180
+    )
+
+
 HANDLERS = {
     "power.fts_status": tool_fts_status,
     "power.fts_search": tool_fts_search,
@@ -176,6 +196,8 @@ HANDLERS = {
     "power.open_loops": tool_open_loops,
     "power.night_watch": tool_night_watch,
     "power.csv": tool_csv,
+    "power.proceed": tool_proceed,
+    "power.ocarina_e2e": tool_ocarina_e2e,
 }
 
 
