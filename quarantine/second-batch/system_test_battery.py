@@ -11,13 +11,18 @@ import json
 import subprocess
 import sys
 from datetime import datetime, timezone
+
+try:
+    from datetime import UTC
+except ImportError:  # Python 3.10
+    UTC = timezone.utc  # noqa: UP017
 from pathlib import Path
 
 WS = Path(__file__).resolve().parents[1]
 
 
 def _utc() -> str:
-    return datetime.now(timezone.utc).isoformat()
+    return datetime.now(UTC).isoformat()
 
 
 def run(cmd: list[str], timeout: int = 180) -> tuple[bool, str]:
@@ -26,7 +31,7 @@ def run(cmd: list[str], timeout: int = 180) -> tuple[bool, str]:
             cmd, cwd=str(WS), text=True, stderr=subprocess.STDOUT, timeout=timeout
         )
         return True, out
-    except Exception as e:
+    except (OSError, subprocess.SubprocessError) as e:
         return False, str(e)[:400]
 
 
@@ -84,12 +89,13 @@ def main() -> int:
 
     # HTTP local harbor
     try:
+        import urllib.error
         import urllib.request
 
         for path in ("/health", "/harbor", "/public/gifts", "/public/GOSPEL_PACKET.json"):
             with urllib.request.urlopen(f"http://127.0.0.1:8742{path}", timeout=3) as r:
                 add(f"http{path}", r.status == 200, str(r.status))
-    except Exception as e:
+    except (OSError, TimeoutError, urllib.error.URLError) as e:
         add("http_taberna", False, str(e)[:120])
 
     if args.live_agent_a:

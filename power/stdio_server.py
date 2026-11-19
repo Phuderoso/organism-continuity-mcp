@@ -7,7 +7,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from server import HANDLERS, TOOLS, mcp_manifest  # noqa: E402
+from server import HANDLERS, TOOLS
 
 
 def _read_message() -> dict | None:

@@ -13,6 +13,11 @@ import json
 import subprocess
 import sys
 from datetime import datetime, timezone
+
+try:
+    from datetime import UTC
+except ImportError:  # Python 3.10
+    UTC = timezone.utc  # noqa: UP017
 from pathlib import Path
 
 # Same workspace-root convention as the live server: two parents up
@@ -22,7 +27,7 @@ WS = Path(__file__).resolve().parents[2]
 
 
 def _utc() -> str:
-    return datetime.now(timezone.utc).isoformat()
+    return datetime.now(UTC).isoformat()
 
 
 def _run_json(cmd: list[str], timeout: int = 45) -> dict:

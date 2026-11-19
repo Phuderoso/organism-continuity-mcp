@@ -15,6 +15,11 @@ import json
 import subprocess
 import sys
 from datetime import datetime, timezone
+
+try:
+    from datetime import UTC
+except ImportError:  # Python 3.10
+    UTC = timezone.utc  # noqa: UP017
 from pathlib import Path
 
 WS = Path(__file__).resolve().parents[2]
@@ -28,13 +33,13 @@ TOOLS = {
 
 
 def _utc() -> str:
-    return datetime.now(timezone.utc).isoformat()
+    return datetime.now(UTC).isoformat()
 
 
 def _run_json(cmd: list[str], timeout: int = 90) -> dict:
     try:
         p = subprocess.run(
-            cmd, capture_output=True, text=True, timeout=timeout, cwd=str(WS)
+            cmd, check=False, capture_output=True, text=True, timeout=timeout, cwd=str(WS)
         )
         text = (p.stdout or "").strip()
         if not text:

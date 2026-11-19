@@ -24,7 +24,7 @@ from pathlib import Path
 
 # Local import
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from server import HANDLERS, TOOLS, mcp_manifest  # noqa: E402
+from server import HANDLERS, TOOLS, mcp_manifest
 
 
 def _read_message() -> dict | None:

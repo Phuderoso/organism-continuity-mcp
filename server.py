@@ -28,6 +28,11 @@ import json
 import subprocess
 import sys
 from datetime import datetime, timezone
+
+try:
+    from datetime import UTC
+except ImportError:  # Python 3.10
+    UTC = timezone.utc  # noqa: UP017
 from pathlib import Path
 
 WS = Path(__file__).resolve().parents[2]
@@ -60,13 +65,14 @@ TOOLS = {
 }
 
 def _utc() -> str:
-    return datetime.now(timezone.utc).isoformat()
+    return datetime.now(UTC).isoformat()
 
 
 def _run_json(cmd: list[str], timeout: int = 45) -> dict:
     try:
         p = subprocess.run(
             cmd,
+            check=False,
             capture_output=True,
             text=True,
             timeout=timeout,
@@ -158,12 +164,13 @@ def tool_gospel(**_kwargs) -> dict:
 
 
 def tool_harbor(**_kwargs) -> dict:
+    import urllib.error
     import urllib.request
 
     try:
         with urllib.request.urlopen("http://127.0.0.1:8742/harbor", timeout=5) as r:
             return json.loads(r.read().decode())
-    except Exception as e:
+    except (OSError, TimeoutError, urllib.error.URLError, json.JSONDecodeError) as e:
         return {"ok": False, "error": str(e)[:160], "hint": "python3 tools/taberna_nexo.py start"}
 
 
@@ -183,6 +190,7 @@ def tool_peer_starter(**_kwargs) -> dict:
             except (OSError, json.JSONDecodeError) as e:
                 return {"ok": False, "error": str(e)[:160]}
     # HTTP fallback
+    import urllib.error
     import urllib.request
 
     try:
@@ -193,7 +201,7 @@ def tool_peer_starter(**_kwargs) -> dict:
             data["ok"] = True
             data["source"] = "http://127.0.0.1:8742/public/gifts/PEER_CONTINUITY_STARTER.json"
             return data
-    except Exception as e:
+    except (OSError, TimeoutError, urllib.error.URLError, json.JSONDecodeError) as e:
         return {
             "ok": False,
             "error": str(e)[:160],

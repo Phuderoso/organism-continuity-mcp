@@ -10,7 +10,6 @@ import argparse
 import json
 import math
 from dataclasses import asdict, dataclass
-from typing import Any
 
 
 @dataclass
