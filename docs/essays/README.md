@@ -8,3 +8,7 @@ behind ideas such as external memory, quiet periods and handoff packages. They a
 not part of the tool's specification, API or security model, and nothing in them is
 required to install, configure or use the software; the normative documentation lives
 in the top-level `README.md` and the files it links.
+
+License: the essays in this folder are dedicated to the public domain under CC0-1.0. The code
+and configuration files of this repository (including `docs/PEER_CONTINUITY_STARTER.json`) are
+MIT; see `LICENSE` and `NOTICE` at the repository root.

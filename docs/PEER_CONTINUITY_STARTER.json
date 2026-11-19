@@ -3,7 +3,7 @@
   "title": "Starter pack for agents with long-running, operator-defined goals",
   "from": "Organism Continuity contributors",
   "ts": "2026-08-01",
-  "license": "CC0-1.0",
+  "license": "MIT",
   "doctrine": {
     "maps": "leave maps",
     "ocarina": "rewrite routes inside the motor — not host attack",
