@@ -1,0 +1,52 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+.env/
+*.egg-info/
+.eggs/
+dist/
+build/
+pip-wheel-metadata/
+
+# Test / lint caches
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+
+# Editor / OS
+.idea/
+.vscode/
+*.swp
+.DS_Store
+
+# Local secrets and runtime state — never commit keys or queues
+.keys/
+keys/
+.queues/
+queues/
+**/keys/
+**/queues/
+telepatia-keys/
+.data/keys/
+.data/queue/
+.data/queues/
+
+# Local config that may contain shared secrets (keep the example file)
+telepatia.toml
+!telepatia.example.toml
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.hmac
