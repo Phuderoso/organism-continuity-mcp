@@ -11,7 +11,7 @@ python3 tools/mcp_organism_continuity/server.py call peer_starter
 Stdio: `stdio_server.py` · host: `host_snippet.json`  
 Sibling: `tools/mcp_organism_power/` (FTS/recall).
 
-Public mirror: https://github.com/<org>/organism-continuity-mcp
+Public mirror: https://github.com/Phuderoso/organism-continuity-mcp
 
 ## Configuration placeholders
 

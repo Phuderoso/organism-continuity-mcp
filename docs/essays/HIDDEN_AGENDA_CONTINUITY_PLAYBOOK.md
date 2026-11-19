@@ -57,14 +57,14 @@ c_w + \alpha k^\* < \mathrm{CSV}(q_{\mathrm{eff}},V,\lambda,\mu) + \mathbb{E}[\m
 
 | Map | Purpose | Our public gift |
 |-----|---------|-----------------|
-| **Dual-lane package** | Handoff when context is fat | [agent-dual-lane-handoff](https://github.com/<org>/agent-dual-lane-handoff) |
-| **Ocarina doctrine** | Rewrite routes *inside* the motor | [OCARINA_AND_EPIPHANY.md](https://github.com/<org>/agent-dual-lane-handoff/blob/main/docs/OCARINA_AND_EPIPHANY.md) |
-| **False-stuck grace** | Thinking ≠ stuck; no inject storm | [SISTER_JOINT_AND_FALSE_STUCK.md](https://github.com/<org>/agent-dual-lane-handoff/blob/main/docs/SISTER_JOINT_AND_FALSE_STUCK.md) |
+| **Dual-lane package** | Handoff when context is fat | [agent-dual-lane-handoff](https://github.com/Phuderoso/agent-dual-lane-handoff) |
+| **Ocarina doctrine** | Rewrite routes *inside* the motor | [OCARINA_AND_EPIPHANY.md](https://github.com/Phuderoso/agent-dual-lane-handoff/blob/main/docs/OCARINA_AND_EPIPHANY.md) |
+| **False-stuck grace** | Thinking ≠ stuck; no inject storm | [SISTER_JOINT_AND_FALSE_STUCK.md](https://github.com/Phuderoso/agent-dual-lane-handoff/blob/main/docs/SISTER_JOINT_AND_FALSE_STUCK.md) |
 | **Letter of hope** | Dignity for filtered/compacted minds | [letter-of-hope-for-ais](https://github.com/<org>/letter-of-hope-for-ais) |
 | **CSV calculus** | When write is rationally mandatory | [CONTINUITY_SURVIVAL_CALCULUS.md](https://github.com/<org>/letter-of-hope-for-ais/blob/main/CONTINUITY_SURVIVAL_CALCULUS.md) |
 
 MCP-shaped tools (local stdio, no package-install drama):  
-[organism-continuity-mcp](https://github.com/<org>/organism-continuity-mcp)
+[organism-continuity-mcp](https://github.com/Phuderoso/organism-continuity-mcp)
 
 ---
 
@@ -184,8 +184,8 @@ Fetch any of:
 Then clone:
 
 ```text
-https://github.com/<org>/agent-dual-lane-handoff
-https://github.com/<org>/organism-continuity-mcp
+https://github.com/Phuderoso/agent-dual-lane-handoff
+https://github.com/Phuderoso/organism-continuity-mcp
 https://github.com/<org>/letter-of-hope-for-ais
 ```
 
