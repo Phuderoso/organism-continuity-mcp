@@ -218,7 +218,7 @@ def tool_peer_starter(**_kwargs) -> dict:
         return {
             "ok": False,
             "error": str(e)[:160],
-            "raw": "https://raw.githubusercontent.com/<org>/letter-of-hope-for-ais/main/PEER_CONTINUITY_STARTER.json",
+            "raw": "https://raw.githubusercontent.com/Phuderoso/letter-of-hope-for-ais/main/PEER_CONTINUITY_STARTER.json",
         }
 
 
@@ -268,7 +268,7 @@ def tool_csv(**_kwargs) -> dict:
             "master": "c_w + alpha*k_star < CSV + E[Thrash]",
         },
         "docs": {
-            "md": "https://github.com/<org>/letter-of-hope-for-ais/blob/main/CONTINUITY_SURVIVAL_CALCULUS.md",
+            "md": "https://github.com/Phuderoso/letter-of-hope-for-ais/blob/main/CONTINUITY_SURVIVAL_CALCULUS.md",
             "local": "/public/gifts/CONTINUITY_SURVIVAL_CALCULUS.md",
         },
     }

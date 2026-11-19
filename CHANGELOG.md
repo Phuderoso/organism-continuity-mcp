@@ -16,7 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Philosophical essays relocated to `docs/essays/` and host-specific names and paths neutralized (`${ORGANISM_HOME}` in host snippets; sibling URLs pending an `<org>` decision).
+- Philosophical essays relocated to `docs/essays/` and host-specific names and paths neutralized (`${ORGANISM_HOME}` in host snippets; sibling URLs at `https://github.com/Phuderoso/...`).
 - `continuity.send_key_map` and the live terminal battery flag marked deprecated/experimental.
 - Optional workspace lookups (gospel, harbor gifts, peer starter, CSV metadata) read under `${ORGANISM_HOME}` (falling back to the repository parent) and use generic `harbor_*` names.
 
@@ -29,8 +29,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   are MIT; essays in `docs/essays/` are CC0-1.0. `NOTICE` added, aligned with `CITATION.cff`.
 - Essays: flagged passages reworded into operator-defined-goals language (ideas and formulas
   unchanged; originals in git history).
-- Sibling links resolved to `https://github.com/Phuderoso/...` for `organism-continuity-mcp` and
-  `agent-dual-lane-handoff`; `letter-of-hope-for-ais` links remain `<org>` placeholders.
+- Sibling links resolved to `https://github.com/Phuderoso/...` for `organism-continuity-mcp`,
+  `agent-dual-lane-handoff`, and `letter-of-hope-for-ais`. The old gist pack link was removed.
 
 ### Removed
 
@@ -66,7 +66,7 @@ Single, adoptable home for open multi-agent continuity tools.
 - Installable package via `pyproject.toml`.
 - Final technical README, `SECURITY.md`, and a credit/`NOTICE` section.
 - Send-key map remains out of the v0.5 package (later batch).
-- Open decisions recorded in `docs/STRUCTURE_PLAN.md` (essay tone, MIT vs CC0 on essays, funnel/doctor side effects, missing helper scripts, sibling-link `<org>` placeholder).
+- Open decisions recorded in `docs/STRUCTURE_PLAN.md` (essay tone, MIT vs CC0 on essays, funnel/doctor side effects, missing helper scripts).
 
 ## [0.4.0] - 2026-08-01
 

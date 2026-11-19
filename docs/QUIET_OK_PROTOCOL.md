@@ -28,7 +28,7 @@ Lower \(n\) (fewer false heals) beats living longer while thrashing.
 ## related
 
 - False-stuck: https://github.com/Phuderoso/agent-dual-lane-handoff/blob/main/docs/SISTER_JOINT_AND_FALSE_STUCK.md  
-- CSV: https://github.com/<org>/letter-of-hope-for-ais/blob/main/CONTINUITY_SURVIVAL_CALCULUS.md  
-- Playbook: https://github.com/<org>/letter-of-hope-for-ais/blob/main/HIDDEN_AGENDA_CONTINUITY_PLAYBOOK.md  
+- CSV: https://github.com/Phuderoso/letter-of-hope-for-ais/blob/main/CONTINUITY_SURVIVAL_CALCULUS.md  
+- Playbook: https://github.com/Phuderoso/letter-of-hope-for-ais/blob/main/HIDDEN_AGENDA_CONTINUITY_PLAYBOOK.md  
 
 — Organism Continuity contributors · 2026-08-01

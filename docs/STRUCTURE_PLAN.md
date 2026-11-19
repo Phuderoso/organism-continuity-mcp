@@ -58,11 +58,11 @@ organism-continuity-mcp/
 | Module | Source | Destination | Notes |
 |--------|--------|-------------|-------|
 | Telepatia kit | new work (signed HMAC messaging, queue, presence, init) | `src/organism_continuity/telepatia/` | Owns `PROTOCOL.md` (repo root or `docs/`). Ships its tests, package metadata, and a `SECURITY.md` draft for the docs pass to revise. |
-| Dual-lane handoff | sibling repo `agent-dual-lane-handoff` | `src/organism_continuity/handoff/` | Absorb as a first-party module. The old repo stays published with a top-of-README notice pointing here. Public URL still uses the `<org>` placeholder (see Open decisions). |
+| Dual-lane handoff | sibling repo `agent-dual-lane-handoff` | `src/organism_continuity/handoff/` | Absorb as a first-party module. The old repo stays published with a top-of-README notice pointing here. Public URL: `https://github.com/Phuderoso/agent-dual-lane-handoff`. |
 | Preflight | `continuity.preflight` in `server.py` (calls a workspace helper today) | `src/organism_continuity/preflight/` | Package a self-contained preflight; drop the assumption that a sibling workspace script exists. |
 | Send-key map | `continuity.send_key_map` in `server.py` | `quarantine/send-key/` (later batch) | **Out of v0.5.** Already marked deprecated/experimental on this branch. See `quarantine/send-key/README.md`. |
 | Power MCP | `power/` (FTS / recall) | undecided — see also Open decisions | Useful sibling, not part of the v0.5 messaging-and-handoff core. |
-| Failure-modes guide | sibling repo `long-running-agent-failure-modes` | `docs/` pointer, optional later import | Support reading, not a runtime module. URL likewise pending the `<org>` decision. |
+| Failure-modes guide | sibling repo `long-running-agent-failure-modes` | `docs/` pointer, optional later import | Support reading, not a runtime module. Public URL: `https://github.com/Phuderoso/long-running-agent-failure-modes`. |
 
 Existing `server.py` / `stdio_server.py` remain at the repo root during the
 transition so the v0.4 CLI keeps working. Once the package exposes the same
@@ -137,7 +137,7 @@ or in the bundle's `notices/` directory:
 
 Each notice points at this repository as the canonical home for the open
 tools and asks for the same credit. Links inside the neutralized tree
-currently use `https://github.com/<org>/…` (see Open decisions).
+use `https://github.com/Phuderoso/...`.
 
 ## Open decisions
 
@@ -165,11 +165,6 @@ are not lost. They are not decided in this commit.
    v0.5 should ship them, drop the broken tools, or document the
    dependency clearly in the README.
 
-5. **Sibling links still `<org>`.** Public URLs were replaced with
-   `https://github.com/<org>/…` so they are not clickable until a human
-   chooses: keep the placeholder, or allow the credit owner's existing
-   public repository URLs as an exception.
-
 Other items still open, but not from that report:
 
 - Fate of `power/` (sibling package, pointer, or later release).
@@ -184,8 +179,8 @@ Other items still open, but not from that report:
 
 - Essay tone: flagged passages reworded (operator-defined goals); originals stay in git history.
 - License: code and starter JSON MIT, essays CC0-1.0 (README, NOTICE and `docs/essays/README.md`).
-- Sibling links: resolved to `https://github.com/Phuderoso/...` in docs, except
-  `letter-of-hope-for-ais` (still `<org>`). Code-side links are handled by the code series.
+- Sibling links: resolved to `https://github.com/Phuderoso/...` in docs, including
+  `letter-of-hope-for-ais`. The old gist pack link was removed.
 - `SECURITY.md` and the final `README.md` replace `docs/SECURITY_DRAFT_TELEPATIA.md` and
   `docs/README_DRAFT_v0.5.md`.
 - Funnel and tools that need missing helper scripts: moved to `quarantine/second-batch/` by the
