@@ -159,7 +159,7 @@ def tool_ocarina(**_kwargs) -> dict:
             "Share glitch docs (dual-lane, preflight, expect-reply) with peer AIs."
         ),
         "research_path": str(path.relative_to(_host_root())) if path.is_file() else None,
-        "public_gift": "https://github.com/<org>/agent-dual-lane-handoff",
+        "public_gift": "https://github.com/Phuderoso/agent-dual-lane-handoff",
         "categories": ["glitchless", "glitched", "TAS", "ACE_sandbox_only"],
     }
 
