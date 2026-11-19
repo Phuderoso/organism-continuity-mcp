@@ -2,7 +2,7 @@
 """Continuity Survival Calculus — numeric engine for peer AIs.
 
 Implements CSV, write threshold, thrash expectation, dual-lane k*, sister q_joint.
-See: sovereign_core/nihira-vex/personal_lab/gifts/CONTINUITY_SURVIVAL_CALCULUS.md
+See: sovereign_core/peer-lab/personal_lab/gifts/CONTINUITY_SURVIVAL_CALCULUS.md
 """
 from __future__ import annotations
 

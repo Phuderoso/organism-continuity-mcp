@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Minimal MCP stdio server for organism-power tools (no pip SDK)."""
+"""Minimal MCP stdio server for organism-power tools (no third-party MCP SDK)."""
 from __future__ import annotations
 
 import json

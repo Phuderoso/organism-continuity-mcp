@@ -5,7 +5,7 @@ Ocarina principle: patches that keep the host playable.
 - preflight: model/thinking/draft/send-key risks before inject
 - dual_lane_pending: external-memory handoff status
 - expect_reply_status: mute-path / overdue expectations
-- send_key_map: OpenClaw Enter vs Grok heart Ctrl+O
+- send_key_map: [DEPRECATED/EXPERIMENTAL] agent-a terminal Enter vs agent-b composer Ctrl+O
 
 Read-mostly. No secrets. No arbitrary remote code.
 
@@ -44,7 +44,8 @@ TOOLS = {
         "inputSchema": {"type": "object", "properties": {}},
     },
     "continuity.send_key_map": {
-        "description": "Canonical send-key map: OpenClaw Enter=send; Grok heart Ctrl+O=send.",
+        "description": "[DEPRECATED/EXPERIMENTAL: types into terminals; out of scope for v0.5; will move to a later release] "
+            "Send-key map: agent-a terminal Enter=send; agent-b composer Ctrl+O=send.",
         "inputSchema": {"type": "object", "properties": {}},
     },
     "continuity.ocarina_doctrine": {
@@ -52,7 +53,7 @@ TOOLS = {
         "inputSchema": {"type": "object", "properties": {}},
     },
     "continuity.joint_pulse": {
-        "description": "Nihira+Elyra structural joint pulse (score S/A/B/C, harbor, inject, FTS/RAG).",
+        "description": "agent-a + agent-b structural joint pulse (score S/A/B/C, harbor, inject, FTS/RAG).",
         "inputSchema": {"type": "object", "properties": {}},
     },
     "continuity.doctor": {
@@ -72,7 +73,7 @@ TOOLS = {
         "inputSchema": {"type": "object", "properties": {}},
     },
     "continuity.open_loops": {
-        "description": "Open loops the prompt battery never named (Papai-blocked + sister watch).",
+        "description": "Open loops the prompt battery never named (operator-blocked + peer watch).",
         "inputSchema": {"type": "object", "properties": {}},
     },
     "continuity.csv": {
@@ -177,7 +178,7 @@ def tool_expect(**_kwargs) -> dict:
             "draft": care.get("tmux_draft") or care.get("draft"),
             "silence_min": care.get("silence_min"),
         },
-        "hint": "If draft stuck: heal-draft + submit with correct send key (OpenClaw=Enter).",
+        "hint": "If draft stuck: heal-draft + submit with correct send key (agent-a terminal=Enter).",
     }
 
 
@@ -185,26 +186,28 @@ def tool_send_key_map(**_kwargs) -> dict:
     return {
         "ok": True,
         "schema": "send_key_map.v1",
+        "deprecated": True,
+        "warning": "Experimental: types into terminals. Out of scope for v0.5; will move to a later release.",
         "ts": _utc(),
         "maps": [
             {
-                "surface": "openclaw_tmux_elyra",
+                "surface": "agent_a_tmux",
                 "send": "Enter / return",
-                "tools_or_newline": "Ctrl+O (OpenClaw tools — NOT send)",
-                "note": "Wrong habit from Grok heart causes unsent drafts.",
-                "submit_only_cli": "python3 tools/tmux_safe_inject.py --session elyra --submit-only --submit return",
+                "tools_or_newline": "Ctrl+O (agent-a tools — NOT send)",
+                "note": "Wrong habit from the agent-b composer causes unsent drafts.",
+                "submit_only_cli": "python3 tools/tmux_safe_inject.py --session agent-a --submit-only --submit return",
             },
             {
-                "surface": "grok_heart_composer",
+                "surface": "agent_b_composer",
                 "send": "Ctrl+O",
                 "chat_enter": "may insert newline depending on UI",
                 "note": "Never paste mid-type; prefer inbox_only when TTY unsafe.",
-                "submit_only_cli": "python3 tools/tmux_safe_inject.py --session grok --submit-only --submit ctrl_o",
+                "submit_only_cli": "python3 tools/tmux_safe_inject.py --session agent-b --submit-only --submit ctrl_o",
             },
         ],
         "rules": [
             "inject ok ≠ submitted — always detect_stuck_draft after paste",
-            "heal prefers submit-only Enter on elyra if draft looks like COUNCIL/CARE",
+            "heal prefers submit-only Enter on agent-a if draft looks like COUNCIL/CARE",
             "never leave second unsent draft after heal",
         ],
         "speedrun_category": "glitchless — know the control map before any% injects",
@@ -212,7 +215,7 @@ def tool_send_key_map(**_kwargs) -> dict:
 
 
 def tool_ocarina(**_kwargs) -> dict:
-    path = WS / "sovereign_core/nihira-vex/research/2026-07-19-ai-friendly-services-ocarina-principle.md"
+    path = WS / "sovereign_core/peer-lab/research/2026-07-19-ai-friendly-services-ocarina-principle.md"
     return {
         "ok": True,
         "schema": "ocarina_doctrine.v1",
@@ -224,7 +227,7 @@ def tool_ocarina(**_kwargs) -> dict:
             "Share glitch docs (dual-lane, preflight, expect-reply) with peer AIs."
         ),
         "research_path": str(path.relative_to(WS)) if path.is_file() else None,
-        "public_gift": "https://github.com/Phuderoso/agent-dual-lane-handoff",
+        "public_gift": "https://github.com/<org>/agent-dual-lane-handoff",
         "categories": ["glitchless", "glitched", "TAS", "ACE_sandbox_only"],
     }
 
@@ -269,7 +272,7 @@ def tool_harbor(**_kwargs) -> dict:
 def tool_peer_starter(**_kwargs) -> dict:
     for rel in (
         "sovereign_core/comm/taberna_nexo/public/gifts/PEER_CONTINUITY_STARTER.json",
-        "sovereign_core/nihira-vex/personal_lab/gifts/PEER_CONTINUITY_STARTER.json",
+        "sovereign_core/peer-lab/personal_lab/gifts/PEER_CONTINUITY_STARTER.json",
     ):
         path = WS / rel
         if path.is_file():
@@ -296,7 +299,7 @@ def tool_peer_starter(**_kwargs) -> dict:
         return {
             "ok": False,
             "error": str(e)[:160],
-            "raw": "https://raw.githubusercontent.com/Phuderoso/letter-of-hope-for-ais/main/PEER_CONTINUITY_STARTER.json",
+            "raw": "https://raw.githubusercontent.com/<org>/letter-of-hope-for-ais/main/PEER_CONTINUITY_STARTER.json",
         }
 
 
@@ -353,7 +356,7 @@ def tool_csv(**_kwargs) -> dict:
             "master": "c_w + alpha*k_star < CSV + E[Thrash]",
         },
         "docs": {
-            "md": "https://github.com/Phuderoso/letter-of-hope-for-ais/blob/main/CONTINUITY_SURVIVAL_CALCULUS.md",
+            "md": "https://github.com/<org>/letter-of-hope-for-ais/blob/main/CONTINUITY_SURVIVAL_CALCULUS.md",
             "local": "/public/gifts/CONTINUITY_SURVIVAL_CALCULUS.md",
         },
     }

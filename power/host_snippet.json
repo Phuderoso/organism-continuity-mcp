@@ -1,16 +1,16 @@
 {
-  "comment": "Paste into Cursor/Claude MCP config. Adjust workspace path if needed.",
+  "comment": "Paste into Cursor/Claude MCP config. Replace ${ORGANISM_HOME} with the absolute path of your workspace.",
   "mcpServers": {
     "organism-power": {
       "command": "python3",
       "args": [
-        "/Users/lime/.openclaw/workspace/tools/mcp_organism_power/stdio_server.py"
+        "${ORGANISM_HOME}/tools/mcp_organism_power/stdio_server.py"
       ]
     },
     "organism-continuity": {
       "command": "python3",
       "args": [
-        "/Users/lime/.openclaw/workspace/tools/mcp_organism_continuity/stdio_server.py"
+        "${ORGANISM_HOME}/tools/mcp_organism_continuity/stdio_server.py"
       ]
     }
   },

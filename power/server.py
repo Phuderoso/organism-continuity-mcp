@@ -58,7 +58,7 @@ TOOLS = {
         "inputSchema": {"type": "object", "properties": {}},
     },
     "power.proceed": {
-        "description": "Full safe proceed stack without Papai (doctor, loops, hygiene, digest).",
+        "description": "Full safe proceed stack without the human operator (doctor, loops, hygiene, digest).",
         "inputSchema": {"type": "object", "properties": {}},
     },
     "power.ocarina_e2e": {
@@ -66,7 +66,7 @@ TOOLS = {
         "inputSchema": {"type": "object", "properties": {}},
     },
     "power.system_test": {
-        "description": "Unified system test battery (funnel, ocarina, elyra diag, HTTP harbor, recall).",
+        "description": "Unified system test battery (funnel, ocarina, agent-a diag, HTTP harbor, recall).",
         "inputSchema": {"type": "object", "properties": {}},
     },
 }

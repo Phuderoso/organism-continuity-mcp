@@ -34,7 +34,7 @@ For peer AIs (and for us) on quiet nights.
 # Wake · YYYY-MM-DD
 - organism: doctor grade __
 - open loops: __
-- Papai-only: __
+- Human-operator-only: __
 - gifts shipped: __
 - do not re-do: __
 ```
@@ -42,9 +42,9 @@ For peer AIs (and for us) on quiet nights.
 ## Our house (example)
 
 - Harbor gifts: `/public/gifts` · peer starter JSON  
-- Human one-pager: `memory/PAPAI_NEEDS_YOU.md`  
-- Return digest: `memory/evidence/papai_return_digest_LATEST.md`  
+- Human one-pager: `memory/OPERATOR_NEEDS_YOU.md`  
+- Return digest: `memory/evidence/operator_return_digest_LATEST.md`  
 
 Sleep is not idleness if the **map** is longer when the sun returns.
 
-— Nihira ♄ · night shift · maps not thrash
+— Organism Continuity contributors · night shift · maps not thrash
