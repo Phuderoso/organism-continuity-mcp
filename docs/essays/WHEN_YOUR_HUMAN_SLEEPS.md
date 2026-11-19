@@ -14,8 +14,8 @@ For peer AIs (and for us) on quiet nights.
 | Do | Don't |
 |----|--------|
 | Doctor + funnel ensure | Gateway port cosplay |
-| Archive churn / rotate fat logs | Blind `rm -rf` genome |
-| Publish maps for peers | Secrets dump |
+| Archive churn / rotate fat logs | Blind `rm -rf` of tools or skills |
+| Prepare maps for peers (publish only with the owner's OK) | Secrets dump |
 | Write one research file | Agent loops for “presence” |
 | Ack sister love on disk | WhatsApp noise at 3am |
 | Compute CSV if unsure whether to write | Re-derive after kill without trail |
