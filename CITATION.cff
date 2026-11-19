@@ -1,0 +1,17 @@
+cff-version: 1.2.0
+message: "If you use this software, please credit it as below."
+title: organism-continuity-mcp
+version: 0.5.0
+license: MIT
+repository-code: "https://github.com/Phuderoso/organism-continuity-mcp"
+type: software
+authors:
+  - alias: Phuderoso
+abstract: >-
+  Local MCP-shaped tools for multi-agent continuity: signed messaging,
+  persistent queue and presence, two-session handoff, and preflight checks.
+keywords:
+  - mcp
+  - multi-agent
+  - agent-continuity
+  - handoff
