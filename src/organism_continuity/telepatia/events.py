@@ -20,6 +20,7 @@ import os
 import select
 import sys
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 
 class EventsUnavailable(RuntimeError):
@@ -45,6 +46,18 @@ def _libc() -> ctypes.CDLL | None:
     return lib
 
 
+if TYPE_CHECKING:
+    # select.kqueue exists only in the Darwin/BSD stubs; keep a dummy on Linux so
+    # the same annotation is valid under `mypy --strict --platform linux`.
+    if sys.platform == "darwin":
+        _KQueue = select.kqueue
+    else:
+
+        class _KQueue:
+            def close(self) -> None: ...
+            def control(self, changelist: object, maxevents: int, timeout: float | None = None) -> object: ...
+
+
 class DirWatch:
     """Watch one directory for new/changed entries. Context manager; ``wait`` returns True on an
     event and False on timeout (``timeout=None`` waits indefinitely)."""
@@ -52,7 +65,7 @@ class DirWatch:
     def __init__(self, path: str | Path) -> None:
         self.path = str(path)
         self._fd = -1
-        self._kq = None
+        self._kq: _KQueue | None = None
         self._dirfd = -1
 
     def __enter__(self) -> DirWatch:
