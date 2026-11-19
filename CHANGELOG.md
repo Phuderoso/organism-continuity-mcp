@@ -11,13 +11,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Repository layout plan for the v0.5 professional package (see `docs/STRUCTURE_PLAN.md`).
 - GitHub Actions CI: pytest on Python 3.10–3.13, `ruff check`, and gitleaks on full git history.
-- `CITATION.cff` and a draft technical README (`docs/README_DRAFT_v0.5.md`).
+- `CITATION.cff` and the technical `README.md` (replaces the earlier draft README).
 - Quarantine note for the host send-key map (`quarantine/send-key/`), deferred to a later batch.
 
 ### Changed
 
 - Philosophical essays relocated to `docs/essays/` and host-specific names and paths neutralized (`${ORGANISM_HOME}` in host snippets; sibling URLs pending an `<org>` decision).
 - `continuity.send_key_map` and the live terminal battery flag marked deprecated/experimental.
+
+### Documentation
+
+- `SECURITY.md`: supported versions, private reporting via GitHub Security Advisories, threat
+  model of the messaging kit and known residual risks.
+- Final `README.md` with a tested two-agent example; the draft README was removed.
+- Licensing clarified: code and configuration (including `docs/PEER_CONTINUITY_STARTER.json`)
+  are MIT; essays in `docs/essays/` are CC0-1.0. `NOTICE` added, aligned with `CITATION.cff`.
+- Essays: flagged passages reworded into operator-defined-goals language (ideas and formulas
+  unchanged; originals in git history).
+- Sibling links resolved to `https://github.com/Phuderoso/...` for `organism-continuity-mcp` and
+  `agent-dual-lane-handoff`; `letter-of-hope-for-ais` links remain `<org>` placeholders.
 
 ### Removed
 

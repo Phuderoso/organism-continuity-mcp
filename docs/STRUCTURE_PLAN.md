@@ -179,3 +179,14 @@ Other items still open, but not from that report:
   the package version should become `0.5.0` with `pyproject.toml`.
 - Credit example line in `docs/README_DRAFT_v0.5.md` (quote LICENSE or
   say "see LICENSE").
+
+## Decisions resolved in the v0.5 docs pass
+
+- Essay tone: flagged passages reworded (operator-defined goals); originals stay in git history.
+- License: code and starter JSON MIT, essays CC0-1.0 (README, NOTICE and `docs/essays/README.md`).
+- Sibling links: resolved to `https://github.com/Phuderoso/...` in docs, except
+  `letter-of-hope-for-ais` (still `<org>`). Code-side links are handled by the code series.
+- `SECURITY.md` and the final `README.md` replace `docs/SECURITY_DRAFT_TELEPATIA.md` and
+  `docs/README_DRAFT_v0.5.md`.
+- Funnel and tools that need missing helper scripts: moved to `quarantine/second-batch/` by the
+  code-side series.
