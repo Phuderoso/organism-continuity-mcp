@@ -15,7 +15,7 @@ from datetime import datetime, timezone
 try:
     from datetime import UTC
 except ImportError:  # Python 3.10
-    UTC = timezone.utc  # noqa: UP017
+    UTC = timezone.utc
 from pathlib import Path
 
 WS = Path(__file__).resolve().parents[1]
@@ -52,7 +52,7 @@ def main() -> int:
 
     # light suite
     suite = [
-        ("funnel", [sys.executable, "tools/taberna_funnel_ensure.py"], lambda o: '"ok_target": true' in o or '"ok_target": true' in o.replace("True", "true")),
+        ("funnel", [sys.executable, "tools/harbor_funnel_ensure.py"], lambda o: '"ok_target": true' in o or '"ok_target": true' in o.replace("True", "true")),
         ("open_loops", [sys.executable, "tools/open_loops_scan.py", "--json"], lambda o: '"schema": "open_loops' in o),
         ("ocarina_e2e", [sys.executable, "tools/ocarina_e2e_demo.py", "--json"], lambda o: '"ok": true' in o),
         ("agent_a_diag", [sys.executable, "tools/agent_a_enhancement_diag.py", "--json"], lambda o: '"ok": true' in o or '"pct": 100' in o),
@@ -96,7 +96,7 @@ def main() -> int:
             with urllib.request.urlopen(f"http://127.0.0.1:8742{path}", timeout=3) as r:
                 add(f"http{path}", r.status == 200, str(r.status))
     except (OSError, TimeoutError, urllib.error.URLError) as e:
-        add("http_taberna", False, str(e)[:120])
+        add("http_harbor", False, str(e)[:120])
 
     if args.live_agent_a:
         ok, out = run(

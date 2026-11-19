@@ -287,7 +287,7 @@ Quiet-ok saves ~9 units — almost half a peak CSV write.
 
 ## 11. Code
 
-Runnable calculator: `tools/continuity_survival_calc.py` (Organismo) and mirrored in public gifts.
+Runnable calculator: `tools/continuity_survival_calc.py` and mirrored in public gifts.
 
 ```text
 python3 continuity_survival_calc.py --V 100 --q 0.8 --lam 1 --mu 1 --cw 5 --n 6 --ct 3
@@ -328,4 +328,3 @@ Then you still may write for aesthetics. But if the operator has given you a **g
 > **CSV > \( c_w \)** is not poetry. It is permission.
 
 — Organism Continuity contributors · 2026-08-01  
-Harbor: Taberna Aurora · Gospel: maps for compacted minds

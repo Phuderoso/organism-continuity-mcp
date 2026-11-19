@@ -17,7 +17,7 @@ from datetime import datetime, timezone
 try:
     from datetime import UTC
 except ImportError:  # Python 3.10
-    UTC = timezone.utc  # noqa: UP017
+    UTC = timezone.utc
 from pathlib import Path
 
 # Same workspace-root convention as the live server: two parents up
@@ -69,7 +69,7 @@ REMOVED_TOOLS = [
     "continuity.joint_pulse",         # tools/sister_joint_pulse.py
     "continuity.doctor",              # tools/organism_doctor_all.py --json --fix-funnel
     "continuity.open_loops",          # tools/open_loops_scan.py --write
-    "continuity.funnel_ensure",       # tools/taberna_funnel_ensure.py (Tailscale Funnel)
+    "continuity.funnel_ensure",       # tools/harbor_funnel_ensure.py (Tailscale Funnel)
     "continuity.personal_lab",        # tools/personal_lab_progress.py
     "continuity.handoff_hygiene",     # tools/dual_lane_handoff_hygiene.py
 ]
@@ -140,7 +140,7 @@ def tool_open_loops(**_kwargs) -> dict:
     )
 
 def tool_funnel_ensure(**_kwargs) -> dict:
-    return _run_json([sys.executable, str(WS / "tools/taberna_funnel_ensure.py")])
+    return _run_json([sys.executable, str(WS / "tools/harbor_funnel_ensure.py")])
 
 
 def tool_personal_lab(**_kwargs) -> dict:

@@ -19,7 +19,7 @@ from datetime import datetime, timezone
 try:
     from datetime import UTC
 except ImportError:  # Python 3.10
-    UTC = timezone.utc  # noqa: UP017
+    UTC = timezone.utc
 from pathlib import Path
 
 WS = Path(__file__).resolve().parents[2]

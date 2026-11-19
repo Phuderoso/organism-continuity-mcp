@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Philosophical essays relocated to `docs/essays/` and host-specific names and paths neutralized (`${ORGANISM_HOME}` in host snippets; sibling URLs pending an `<org>` decision).
 - `continuity.send_key_map` and the live terminal battery flag marked deprecated/experimental.
+- Optional workspace lookups (gospel, harbor gifts, peer starter, CSV metadata) read under `${ORGANISM_HOME}` (falling back to the repository parent) and use generic `harbor_*` names.
 
 ### Documentation
 

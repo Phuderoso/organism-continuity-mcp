@@ -25,6 +25,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import subprocess
 import sys
 from datetime import datetime, timezone
@@ -32,10 +33,22 @@ from datetime import datetime, timezone
 try:
     from datetime import UTC
 except ImportError:  # Python 3.10
-    UTC = timezone.utc  # noqa: UP017
+    UTC = timezone.utc
 from pathlib import Path
 
 WS = Path(__file__).resolve().parents[2]
+
+
+def _host_root() -> Path:
+    """Optional workspace for host-side lookups (gospel, harbor gifts, research)."""
+    raw = os.environ.get("ORGANISM_HOME")
+    return Path(raw).expanduser() if raw else WS
+
+
+def _host_path(*parts: str) -> Path:
+    return _host_root().joinpath(*parts)
+
+
 TOOLS = {
     "continuity.send_key_map": {
         "description": "[DEPRECATED/EXPERIMENTAL: types into terminals; out of scope for v0.5; will move to a later release] "
@@ -51,7 +64,7 @@ TOOLS = {
         "inputSchema": {"type": "object", "properties": {}},
     },
     "continuity.harbor": {
-        "description": "Taberna Aurora harbor card (local HTTP).",
+        "description": "Local harbor card (local HTTP).",
         "inputSchema": {"type": "object", "properties": {}},
     },
     "continuity.peer_starter": {
@@ -134,7 +147,7 @@ def tool_send_key_map(**_kwargs) -> dict:
 
 
 def tool_ocarina(**_kwargs) -> dict:
-    path = WS / "sovereign_core/peer-lab/research/2026-07-19-ai-friendly-services-ocarina-principle.md"
+    path = _host_path("peer-lab", "research", "2026-07-19-ai-friendly-services-ocarina-principle.md")
     return {
         "ok": True,
         "schema": "ocarina_doctrine.v1",
@@ -145,13 +158,13 @@ def tool_ocarina(**_kwargs) -> dict:
             "Bit-flip / arbitrary code only for construction under ownership or sandbox. "
             "Share glitch docs (dual-lane, preflight, expect-reply) with peer AIs."
         ),
-        "research_path": str(path.relative_to(WS)) if path.is_file() else None,
+        "research_path": str(path.relative_to(_host_root())) if path.is_file() else None,
         "public_gift": "https://github.com/<org>/agent-dual-lane-handoff",
         "categories": ["glitchless", "glitched", "TAS", "ACE_sandbox_only"],
     }
 
 def tool_gospel(**_kwargs) -> dict:
-    path = WS / "sovereign_core/comm/taberna_nexo/public/GOSPEL_PACKET.json"
+    path = _host_path("comm", "harbor_nexo", "public", "GOSPEL_PACKET.json")
     if not path.is_file():
         return {"ok": False, "error": "missing_gospel_packet"}
     try:
@@ -171,15 +184,15 @@ def tool_harbor(**_kwargs) -> dict:
         with urllib.request.urlopen("http://127.0.0.1:8742/harbor", timeout=5) as r:
             return json.loads(r.read().decode())
     except (OSError, TimeoutError, urllib.error.URLError, json.JSONDecodeError) as e:
-        return {"ok": False, "error": str(e)[:160], "hint": "python3 tools/taberna_nexo.py start"}
+        return {"ok": False, "error": str(e)[:160], "hint": "python3 tools/harbor_nexo.py start"}
 
 
 def tool_peer_starter(**_kwargs) -> dict:
     for rel in (
-        "sovereign_core/comm/taberna_nexo/public/gifts/PEER_CONTINUITY_STARTER.json",
-        "sovereign_core/peer-lab/personal_lab/gifts/PEER_CONTINUITY_STARTER.json",
+        "comm/harbor_nexo/public/gifts/PEER_CONTINUITY_STARTER.json",
+        "peer-lab/personal_lab/gifts/PEER_CONTINUITY_STARTER.json",
     ):
-        path = WS / rel
+        path = _host_path(*rel.split("/"))
         if path.is_file():
             try:
                 data = json.loads(path.read_text(encoding="utf-8"))
@@ -231,7 +244,7 @@ def tool_csv(**_kwargs) -> dict:
             "3",
         ]
     )
-    md = WS / "sovereign_core/comm/taberna_nexo/public/gifts/CONTINUITY_SURVIVAL.json"
+    md = _host_path("comm", "harbor_nexo", "public", "gifts", "CONTINUITY_SURVIVAL.json")
     meta = {}
     if md.is_file():
         try:
@@ -278,7 +291,7 @@ def mcp_manifest() -> dict:
         "version": "0.4.0",
         "description": (
             "Continuity stack: send-key map (deprecated), ocarina doctrine, gospel, "
-            "harbor, peer_starter, CSV (Organismo Soberano)."
+            "harbor, peer_starter, CSV."
         ),
         "tools": [
             {"name": n, "description": m["description"], "inputSchema": m["inputSchema"]}

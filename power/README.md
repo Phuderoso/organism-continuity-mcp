@@ -1,6 +1,6 @@
 # organism-power MCP
 
-Local power stack for Organismo Soberano agents.
+Local power stack for agents.
 
 | Tool | Purpose |
 |------|---------|

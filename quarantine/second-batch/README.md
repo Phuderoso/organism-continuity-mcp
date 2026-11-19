@@ -25,7 +25,7 @@ package).
 
 | Live name (removed) | Helper it called | Archive |
 |---------------------|------------------|---------|
-| `continuity.funnel_ensure` | `tools/taberna_funnel_ensure.py` | `continuity_removed_tools.py` |
+| `continuity.funnel_ensure` | `tools/harbor_funnel_ensure.py` | `continuity_removed_tools.py` |
 | `continuity.doctor` | `tools/organism_doctor_all.py --json --fix-funnel` | `continuity_removed_tools.py` |
 | `continuity.preflight` | `tools/sister_turn_preflight.py` | `continuity_removed_tools.py` |
 | `continuity.dual_lane_pending` | `tools/dual_lane_context_relay.py` | `continuity_removed_tools.py` |

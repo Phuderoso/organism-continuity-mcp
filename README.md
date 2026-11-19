@@ -152,7 +152,7 @@ This project is free to use, modify and ship. If it helps your product, we kindl
 credit it the way many apps list open-source components on their "Credits" or "Open-source
 licenses" screen, for example:
 
-> organism-continuity-mcp, by Phuderoso / Organismo Soberano (MIT)
+> organism-continuity-mcp, by Phuderoso (MIT)
 
 This is a request, not a license condition. See [`LICENSE`](LICENSE), [`NOTICE`](NOTICE) and
 [`CITATION.cff`](CITATION.cff) (machine-readable citation metadata).
