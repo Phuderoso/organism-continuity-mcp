@@ -19,6 +19,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Philosophical essays relocated to `docs/essays/` and host-specific names and paths neutralized (`${ORGANISM_HOME}` in host snippets; sibling URLs pending an `<org>` decision).
 - `continuity.send_key_map` and the live terminal battery flag marked deprecated/experimental.
 
+### Removed
+
+- Funnel (`continuity.funnel_ensure`) and doctor (`continuity.doctor`, including `--fix-funnel`), plus the other MCP tools that called helper scripts not shipped in this repository: `preflight`, `dual_lane_pending`, `expect_reply_status`, `joint_pulse`, `open_loops`, `personal_lab`, `handoff_hygiene`, and the power tools other than `power.csv`. Code moved to `quarantine/second-batch/`. Removidas até virem com testes.
+
 ## [0.5.0] - TBD
 
 Single, adoptable home for open multi-agent continuity tools.

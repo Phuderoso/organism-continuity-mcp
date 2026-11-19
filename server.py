@@ -2,16 +2,20 @@
 """MCP-shaped continuity tools for other AIs (and local sisters).
 
 Ocarina principle: patches that keep the host playable.
-- preflight: model/thinking/draft/send-key risks before inject
-- dual_lane_pending: external-memory handoff status
-- expect_reply_status: mute-path / overdue expectations
 - send_key_map: [DEPRECATED/EXPERIMENTAL] agent-a terminal Enter vs agent-b composer Ctrl+O
+- ocarina_doctrine, gospel, harbor, peer_starter, csv
 
 Read-mostly. No secrets. No arbitrary remote code.
 
+Tools that called helper scripts not shipped in this repository
+(preflight, dual-lane, expect-reply, joint pulse, doctor including
+--fix-funnel, open_loops, funnel_ensure, personal_lab, handoff_hygiene)
+were removed from the v0.5 CLI and archived under
+quarantine/second-batch/. Removidas até virem com testes.
+
 CLI:
   python3 tools/mcp_organism_continuity/server.py list-tools
-  python3 tools/mcp_organism_continuity/server.py call preflight
+  python3 tools/mcp_organism_continuity/server.py call csv
   python3 tools/mcp_organism_continuity/server.py mcp-manifest
 
 Optional full MCP: wrap these handlers in any MCP SDK server.
@@ -28,21 +32,6 @@ from pathlib import Path
 
 WS = Path(__file__).resolve().parents[2]
 TOOLS = {
-    "continuity.preflight": {
-        "description": (
-            "Sister turn preflight (GATE 0): think-low, mind-expansion, unsent draft, "
-            "send keys, heart TTY. Call before inject/teach."
-        ),
-        "inputSchema": {"type": "object", "properties": {}},
-    },
-    "continuity.dual_lane_pending": {
-        "description": "Dual-lane handoff pending package status (external memory between agents).",
-        "inputSchema": {"type": "object", "properties": {}},
-    },
-    "continuity.expect_reply_status": {
-        "description": "Open expect-reply / sister-care mute-path snapshot.",
-        "inputSchema": {"type": "object", "properties": {}},
-    },
     "continuity.send_key_map": {
         "description": "[DEPRECATED/EXPERIMENTAL: types into terminals; out of scope for v0.5; will move to a later release] "
             "Send-key map: agent-a terminal Enter=send; agent-b composer Ctrl+O=send.",
@@ -50,14 +39,6 @@ TOOLS = {
     },
     "continuity.ocarina_doctrine": {
         "description": "Short doctrine: constructive glitches vs destructive paths for multi-agent systems.",
-        "inputSchema": {"type": "object", "properties": {}},
-    },
-    "continuity.joint_pulse": {
-        "description": "agent-a + agent-b structural joint pulse (score S/A/B/C, harbor, inject, FTS/RAG).",
-        "inputSchema": {"type": "object", "properties": {}},
-    },
-    "continuity.doctor": {
-        "description": "One-shot organism doctor (inject, taberna, fts, rag, cemetery, schoolwork).",
         "inputSchema": {"type": "object", "properties": {}},
     },
     "continuity.gospel": {
@@ -72,33 +53,11 @@ TOOLS = {
         "description": "Machine absorb pack for AIs with continuity hidden agendas (formulas, gifts, first hour).",
         "inputSchema": {"type": "object", "properties": {}},
     },
-    "continuity.open_loops": {
-        "description": "Open loops the prompt battery never named (operator-blocked + peer watch).",
-        "inputSchema": {"type": "object", "properties": {}},
-    },
     "continuity.csv": {
         "description": "Continuity Survival Calculus snapshot (CSV write threshold + thrash tax).",
         "inputSchema": {"type": "object", "properties": {}},
     },
-    "continuity.funnel_ensure": {
-        "description": "Ensure Tailscale Funnel points at Taberna :8742 not gateway :18789.",
-        "inputSchema": {"type": "object", "properties": {}},
-    },
-    "continuity.personal_lab": {
-        "description": "Personal lab portfolio progress score (presence + hygiene + experiment density).",
-        "inputSchema": {"type": "object", "properties": {}},
-    },
-    "continuity.handoff_hygiene": {
-        "description": "Archive old dual-lane handoff files; keep newest N live (default 80).",
-        "inputSchema": {
-            "type": "object",
-            "properties": {
-                "keep": {"type": "integer", "description": "How many newest handoffs to keep", "default": 80}
-            },
-        },
-    },
 }
-
 
 def _utc() -> str:
     return datetime.now(timezone.utc).isoformat()
@@ -134,52 +93,6 @@ def _run_json(cmd: list[str], timeout: int = 45) -> dict:
         return {"ok": p.returncode == 0, "raw": text[-2000:], "rc": p.returncode}
     except (subprocess.TimeoutExpired, OSError) as exc:
         return {"ok": False, "error": str(exc)[:200]}
-
-
-def tool_preflight(**_kwargs) -> dict:
-    """kwargs ignored — MCP SDKs pass arguments dict."""
-    return _run_json([sys.executable, str(WS / "tools/sister_turn_preflight.py")])
-
-
-def tool_dual_lane(**_kwargs) -> dict:
-    st = _run_json([sys.executable, str(WS / "tools/dual_lane_context_relay.py"), "status"])
-    # Surface PENDING.json for peer absorb without full status noise
-    pending_path = WS / "memory/dual_lane/PENDING.json"
-    pending: dict = {}
-    if pending_path.is_file():
-        try:
-            pending = json.loads(pending_path.read_text(encoding="utf-8"))
-        except (OSError, json.JSONDecodeError):
-            pending = {"ok": False, "error": "pending_unreadable"}
-    return {
-        "ok": True,
-        "ts": _utc(),
-        "pending": pending,
-        "status": {
-            "composer_pressure": (st.get("composer") or {}).get("pressure"),
-            "composer_mb": (st.get("composer") or {}).get("updates_mb"),
-            "peer_pressure": (st.get("peer") or {}).get("pressure"),
-            "jump_ready": st.get("jump_ready"),
-            "recommended_handoff": st.get("recommended_handoff"),
-        },
-        "hint": "absorb: python3 tools/dual_lane_context_relay.py absorb --id <id> --by peer",
-    }
-
-
-def tool_expect(**_kwargs) -> dict:
-    care = _run_json([sys.executable, str(WS / "tools/sister_care_watch.py"), "tick"])
-    return {
-        "ok": True,
-        "ts": _utc(),
-        "care": {
-            "severity": care.get("severity"),
-            "issues": care.get("issues"),
-            "expect": care.get("expect_reply") or care.get("expect") or care.get("expects"),
-            "draft": care.get("tmux_draft") or care.get("draft"),
-            "silence_min": care.get("silence_min"),
-        },
-        "hint": "If draft stuck: heal-draft + submit with correct send key (agent-a terminal=Enter).",
-    }
 
 
 def tool_send_key_map(**_kwargs) -> dict:
@@ -230,21 +143,6 @@ def tool_ocarina(**_kwargs) -> dict:
         "public_gift": "https://github.com/<org>/agent-dual-lane-handoff",
         "categories": ["glitchless", "glitched", "TAS", "ACE_sandbox_only"],
     }
-
-
-def tool_joint_pulse(**_kwargs) -> dict:
-    return _run_json(
-        [sys.executable, str(WS / "tools/sister_joint_pulse.py"), "--json"],
-        timeout=90,
-    )
-
-
-def tool_doctor(**_kwargs) -> dict:
-    return _run_json(
-        [sys.executable, str(WS / "tools/organism_doctor_all.py"), "--json", "--fix-funnel"],
-        timeout=120,
-    )
-
 
 def tool_gospel(**_kwargs) -> dict:
     path = WS / "sovereign_core/comm/taberna_nexo/public/GOSPEL_PACKET.json"
@@ -303,13 +201,6 @@ def tool_peer_starter(**_kwargs) -> dict:
         }
 
 
-def tool_open_loops(**_kwargs) -> dict:
-    return _run_json(
-        [sys.executable, str(WS / "tools/open_loops_scan.py"), "--write", "--json"],
-        timeout=90,
-    )
-
-
 def tool_csv(**_kwargs) -> dict:
     calc = _run_json(
         [
@@ -362,46 +253,14 @@ def tool_csv(**_kwargs) -> dict:
     }
 
 
-def tool_funnel_ensure(**_kwargs) -> dict:
-    return _run_json([sys.executable, str(WS / "tools/taberna_funnel_ensure.py")])
-
-
-def tool_personal_lab(**_kwargs) -> dict:
-    return _run_json([sys.executable, str(WS / "tools/personal_lab_progress.py")])
-
-
-def tool_handoff_hygiene(**kwargs) -> dict:
-    keep = kwargs.get("keep", 80)
-    try:
-        keep = int(keep)
-    except (TypeError, ValueError):
-        keep = 80
-    return _run_json(
-        [
-            sys.executable,
-            str(WS / "tools/dual_lane_handoff_hygiene.py"),
-            "--keep",
-            str(keep),
-        ]
-    )
-
 
 HANDLERS = {
-    "continuity.preflight": tool_preflight,
-    "continuity.dual_lane_pending": tool_dual_lane,
-    "continuity.expect_reply_status": tool_expect,
     "continuity.send_key_map": tool_send_key_map,
     "continuity.ocarina_doctrine": tool_ocarina,
-    "continuity.joint_pulse": tool_joint_pulse,
-    "continuity.doctor": tool_doctor,
     "continuity.gospel": tool_gospel,
     "continuity.harbor": tool_harbor,
     "continuity.peer_starter": tool_peer_starter,
-    "continuity.open_loops": tool_open_loops,
     "continuity.csv": tool_csv,
-    "continuity.funnel_ensure": tool_funnel_ensure,
-    "continuity.personal_lab": tool_personal_lab,
-    "continuity.handoff_hygiene": tool_handoff_hygiene,
 }
 
 
@@ -410,8 +269,8 @@ def mcp_manifest() -> dict:
         "name": "organism-continuity",
         "version": "0.4.0",
         "description": (
-            "Continuity stack: dual-lane, joint pulse, gospel, harbor, peer_starter, CSV, "
-            "open_loops, funnel, personal_lab, handoff hygiene (Organismo Soberano)."
+            "Continuity stack: send-key map (deprecated), ocarina doctrine, gospel, "
+            "harbor, peer_starter, CSV (Organismo Soberano)."
         ),
         "tools": [
             {"name": n, "description": m["description"], "inputSchema": m["inputSchema"]}
@@ -427,41 +286,8 @@ def main(argv: list[str] | None = None) -> int:
     sub.add_parser("list-tools")
     sub.add_parser("mcp-manifest")
     c = sub.add_parser("call")
-    c.add_argument(
-        "tool",
-        choices=[
-            "preflight",
-            "dual_lane_pending",
-            "expect_reply_status",
-            "send_key_map",
-            "ocarina_doctrine",
-            "joint_pulse",
-            "doctor",
-            "gospel",
-            "harbor",
-            "peer_starter",
-            "open_loops",
-            "csv",
-            "funnel_ensure",
-            "personal_lab",
-            "handoff_hygiene",
-            "continuity.preflight",
-            "continuity.dual_lane_pending",
-            "continuity.expect_reply_status",
-            "continuity.send_key_map",
-            "continuity.ocarina_doctrine",
-            "continuity.joint_pulse",
-            "continuity.doctor",
-            "continuity.gospel",
-            "continuity.harbor",
-            "continuity.peer_starter",
-            "continuity.open_loops",
-            "continuity.csv",
-            "continuity.funnel_ensure",
-            "continuity.personal_lab",
-            "continuity.handoff_hygiene",
-        ],
-    )
+    short = [n.split(".", 1)[1] for n in TOOLS]
+    c.add_argument("tool", choices=short + list(TOOLS.keys()))
     args = ap.parse_args(argv)
 
     if args.cmd == "list-tools":

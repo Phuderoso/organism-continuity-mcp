@@ -17,8 +17,8 @@
   "cli_smoke": [
     "python3 tools/mcp_organism_continuity/server.py list-tools",
     "python3 tools/mcp_organism_continuity/server.py call peer_starter",
-    "python3 tools/mcp_organism_continuity/server.py call funnel_ensure",
-    "python3 tools/mcp_organism_power/server.py call fts_status",
-    "python3 tools/mcp_organism_power/server.py call recall --query 'quiet_ok' --limit 5"
+    "python3 tools/mcp_organism_continuity/server.py call csv",
+    "python3 tools/mcp_organism_power/server.py list-tools",
+    "python3 tools/mcp_organism_power/server.py call csv"
   ]
 }
