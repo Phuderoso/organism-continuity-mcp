@@ -23,6 +23,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Funnel (`continuity.funnel_ensure`) and doctor (`continuity.doctor`, including `--fix-funnel`), plus the other MCP tools that called helper scripts not shipped in this repository: `preflight`, `dual_lane_pending`, `expect_reply_status`, `joint_pulse`, `open_loops`, `personal_lab`, `handoff_hygiene`, and the power tools other than `power.csv`. Code moved to `quarantine/second-batch/`. Removidas até virem com testes.
 
+### Added (telepatia kit, applied on top of cb8f368)
+
+- `organism_continuity.telepatia`: signed `telepatia-sig v=1` messages between local agents over a
+  file spool (per-sender HMAC-SHA256, constant-time compare, freshness against the file mtime,
+  persisted nonce store that fails closed), persistent event-driven outbox, advisory presence,
+  key init/rotation/revocation. Nonce-store reset refuses old signed timestamps whatever the
+  mtime; nonces are persisted before files are consumed, and a failed save leaves them retriable.
+- Test fixtures shred key files after each test; pytest keeps tmp dirs only for failed tests.
+- Protocol clarifications: cross-verification is at the MAC level, the spool profile is stricter,
+  vectors 2-4 are MAC-only, and unsigned-mode config keys are refused.
+- `organism_continuity.handoff`: the session handoff module as its own package (command
+  `telepatia-handoff`), importing signing and delivery from `organism_continuity.telepatia`;
+  tests in `tests/handoff/`, examples in `examples/handoff/`, guide in `docs/HANDOFF.md`.
+- Normative `docs/PROTOCOL.md` with interop test vectors (`tests/vectors/telepatia-sig-v1.json`).
+- `pyproject.toml` (package `organism-continuity` 0.5.0, console scripts `telepatia` and
+  `telepatia-handoff`, no runtime dependencies), `docs/TELEPATIA.md`, `examples/telepatia/`,
+  and an extra workflow (`telepatia.yml`: coverage, mypy, macOS).
+
 ## [0.5.0] - TBD
 
 Single, adoptable home for open multi-agent continuity tools.

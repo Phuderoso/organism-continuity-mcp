@@ -1,0 +1,52 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "organism-continuity"
+version = "0.5.0"
+description = "Open multi-agent continuity tools: signed telepatia messaging and session handoff."
+readme = "docs/TELEPATIA.md"
+requires-python = ">=3.10"
+license = "MIT"
+license-files = ["LICENSE", "NOTICE*"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Operating System :: POSIX",
+]
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest>=8,<10", "pytest-cov>=5", "ruff==0.17.6", "mypy>=1.10"]
+
+[project.scripts]
+telepatia = "organism_continuity.telepatia.cli:main"
+telepatia-handoff = "organism_continuity.handoff.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+"organism_continuity.telepatia" = ["py.typed"]
+"organism_continuity.handoff" = ["py.typed"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+tmp_path_retention_policy = "failed"
+
+[tool.mypy]
+mypy_path = "src"
+strict = true
+
+[tool.coverage.run]
+source = ["organism_continuity"]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
