@@ -146,7 +146,7 @@ are not lost. They are not decided in this commit.
 
 1. **Essay tone.** The neutralization pass scrubbed names but left framing
    flags (titles such as "hidden agenda", motto, "love as license",
-   autonomous night-work wording). **PHASEONE decides** whether those
+   autonomous night-work wording). **The maintainers decide** whether those
    texts are rewritten, retitled, or left as essays with a disclaimer.
 
 2. **One single license.** The repository is MIT. The essays and
