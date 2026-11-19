@@ -1,0 +1,4 @@
+# SPDX-License-Identifier: MIT
+# Name and key path only. Receive this key out-of-band, never paste it here.
+[peers.agent-b]
+key_file = "keys/agent-b.key"

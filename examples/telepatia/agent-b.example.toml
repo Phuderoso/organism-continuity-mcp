@@ -1,0 +1,10 @@
+# SPDX-License-Identifier: MIT
+[identity]
+name = "agent-b"
+key_file = "keys/agent-b.key"
+
+[spool]
+dir = "../spool"
+
+[peers]
+file = "peers.toml"
