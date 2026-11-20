@@ -13,7 +13,9 @@ comments on a code-hosting service, wake requests or relayed texts (``relay``):
    neither older than ``MAX_RECEIVE_AGE_S`` nor more than ``WINDOW_S`` ahead of the local clock.
 4. The nonce is claimed in a :class:`~organism_continuity.telepatia.ledger.ReplayLedger` under
    one lock; a nonce already there is ``replayed_nonce``. A ledger problem raises
-   :class:`~organism_continuity.telepatia.ledger.ReplayLedgerError` (fail closed).
+   :class:`~organism_continuity.telepatia.ledger.ReplayLedgerError` (fail closed). A text whose
+   expiry (``ts + WINDOW_S``) is below the ledger's prune watermark is ``stale``: its nonce may
+   already have been pruned, for example after a backward clock step.
 
 ``dry_run=True`` performs every check against a read-only view of the ledger and claims nothing,
 so the same text still verifies (once) later.
@@ -106,6 +108,9 @@ def verify_text(
     with ledger.transaction(write=not dry_run, clock=now) as view:
         if view.seen(entry):
             return result(signing.REPLAYED_NONCE)
+        if view.forgotten(ts + WINDOW_S):
+            # its nonce may have been pruned (clock stepped back after a prune): refuse
+            return result(signing.STALE)
         if not dry_run:
             view.claim(entry, ts + WINDOW_S)
     return result(signing.VERIFIED, claimed=not dry_run)

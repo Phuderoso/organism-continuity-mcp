@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Replay ledger (`channel` / `ledger`): a backward clock step after a prune could re-admit a
+  forgotten nonce. The ledger now stores a prune `watermark` that never decreases, and
+  `verify_text` returns `stale` for a text whose `ts + 600` is below it (dry run included).
+  Ledgers without `watermark` (0.5.1) still load; a 0.5.1 reader refuses a ledger that has one
+  (fail closed). Caveat added to `docs/PROTOCOL.md` section 14 and `SECURITY.md`.
+
 ### Added
 
 - Repository layout plan for the v0.5 professional package (see `docs/STRUCTURE_PLAN.md`).

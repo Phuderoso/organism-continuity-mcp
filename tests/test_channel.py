@@ -120,3 +120,15 @@ def test_signed_relay_grants_relayer_not_origin(ledger: ReplayLedger) -> None:
 def test_unsigned_relay_is_unsigned(ledger: ReplayLedger) -> None:
     res = check(relay.format_relay("agent-c", "hi"), ledger)
     assert res.status == signing.UNSIGNED and res.relay is None
+
+
+def test_backward_clock_step_after_prune_does_not_allow_replay(ledger: ReplayLedger) -> None:
+    text = signed(ts=T)
+    assert check(text, ledger, receive=T, now=T).verified
+    # Much later (clock far ahead), another text is claimed and the first entry is pruned.
+    later = T + channel.MAX_RECEIVE_AGE_S + 10 * channel.WINDOW_S
+    assert check(signed("other\n", ts=int(later)), ledger, receive=later, now=later).verified
+    # The clock steps back to the original time: the forgotten nonce must not verify again.
+    again = check(text, ledger, receive=T, now=T)
+    assert again.status == signing.STALE and not again.claimed
+    assert check(text, ledger, receive=T, now=T, dry_run=True).status == signing.STALE

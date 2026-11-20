@@ -26,7 +26,11 @@ def test_missing_is_empty_and_claim_persists(state: Path) -> None:
     assert oct(os.stat(state / "ledger.json").st_mode & 0o777) == "0o600"
     with led.transaction(clock=1000.0) as view:
         assert view.seen("a:1")
-    assert json.loads((state / "ledger.json").read_text()) == {"v": 1, "nonces": {"a:1": 1600.0}}
+    assert json.loads((state / "ledger.json").read_text()) == {
+        "v": 1,
+        "nonces": {"a:1": 1600.0},
+        "watermark": 1000.0 - L.KEEP_AFTER_EXPIRY_S,
+    }
 
 
 def test_read_only_creates_nothing_and_cannot_claim(state: Path) -> None:
@@ -82,6 +86,9 @@ def test_error_inside_block_saves_nothing(state: Path) -> None:
         b'{"v": 1, "nonces": {"a:1": true}}',
         b'{"v": 1, "nonces": {"a:1": NaN}}',
         b'{"v": 1, "nonces": {"a:1": Infinity}}',
+        b'{"v": 1, "nonces": {}, "watermark": NaN}',
+        b'{"v": 1, "nonces": {}, "watermark": "x"}',
+        b'{"v": 1, "nonces": {}, "watermark": false}',
         b"[" * 200_000 + b"]" * 200_000,
     ],
 )
@@ -175,3 +182,23 @@ def test_invalid_clock_and_expiry(state: Path) -> None:
 
 def test_ledger_key() -> None:
     assert L.ledger_key("agent-a", "ab") == "agent-a:ab"
+
+
+def test_watermark_never_decreases_and_old_format_loads(state: Path) -> None:
+    p = state / "ledger.json"
+    p.write_text('{"v": 1, "nonces": {"a:1": 5.0}}')  # 0.5.1 format, no watermark
+    os.chmod(p, 0o600)
+    led = L.ReplayLedger(p)
+    with led.transaction(write=False) as view:
+        assert view.seen("a:1") and view.watermark == float("-inf") and not view.forgotten(-1e18)
+    far = 10.0 + L.KEEP_AFTER_EXPIRY_S + 1000
+    with led.transaction(clock=far) as view:
+        view.claim("b:1", far + 600)
+    with led.transaction(write=False) as view:
+        assert not view.seen("a:1")  # pruned
+        assert view.watermark == far - L.KEEP_AFTER_EXPIRY_S
+        assert view.forgotten(5.0) and not view.forgotten(far + 600)
+    with led.transaction(clock=0.0) as view:  # clock stepped back
+        view.claim("c:1", 600.0)
+    with led.transaction(write=False) as view:
+        assert view.watermark == far - L.KEEP_AFTER_EXPIRY_S  # not lowered
