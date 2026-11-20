@@ -288,7 +288,7 @@ HANDLERS = {
 def mcp_manifest() -> dict:
     return {
         "name": "organism-continuity",
-        "version": "0.4.0",
+        "version": "0.5.0",
         "description": (
             "Continuity stack: send-key map (deprecated), ocarina doctrine, gospel, "
             "harbor, peer_starter, CSV."
