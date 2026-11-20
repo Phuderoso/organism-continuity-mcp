@@ -54,6 +54,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `telepatia-handoff`, no runtime dependencies), `docs/TELEPATIA.md`, `examples/telepatia/`,
   and an extra workflow (`telepatia.yml`: coverage, mypy, macOS).
 
+## [0.5.1] - 2026-11-19
+
+### Added
+
+- `organism_continuity.telepatia.channel`: verify a `telepatia-sig v=1` text from a non-spool
+  transport (comments, wake requests, relays) against the transport's receive time, once.
+  Non-finite receive times are refused before any other check; receive times more than 7 days
+  old or more than 600 s in the future are `stale`. `dry_run=True` checks against a read-only
+  ledger and claims nothing.
+- `organism_continuity.telepatia.ledger`: one-shot replay ledger for those texts, locked with
+  `flock` and written atomically. Fails closed on a symlinked, special, foreign-owned,
+  group/other-accessible, oversized, corrupt or deeply nested ledger, and on a symlinked or
+  group/other-writable parent directory (checked with `lstat`). Pruning uses the local clock
+  with a 7-day margin that matches the receive-time bound.
+- `organism_continuity.telepatia.relay`: relay bodies (`<!-- telepatia-relay -->`, origin,
+  optional recipient and reply-to) that are unsigned by default; signing is opt-in per call and
+  always as the relayer. Messages that already end in a signature trailer are refused.
+- CLI: `telepatia relay` (prints a relay body; `--sign` opt-in) and `telepatia verify-text`
+  (`--receive-time`, `--ledger`, `--dry-run`; exit 4 when rejected).
+- `docs/PROTOCOL.md` section 14 specifies the non-spool verification order, the ledger format
+  and the relay body. Test vectors moved to section 15 unchanged.
+
+### Changed
+
+- Version 0.5.1 in `pyproject.toml`, the package `__version__`s, `CITATION.cff`, `README.md` and
+  the MCP manifest (`server.py`).
+
 ## [0.5.0] - TBD
 
 Single, adoptable home for open multi-agent continuity tools.

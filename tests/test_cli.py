@@ -6,11 +6,13 @@ import os
 import stat
 import subprocess
 import sys
+from datetime import datetime
 from pathlib import Path
 
 import pytest
 
 from organism_continuity.telepatia import cli, inbox, signing
+from organism_continuity.telepatia._compat import UTC
 
 
 def run(capsys, *argv: str) -> tuple[int, str, str]:
@@ -159,7 +161,7 @@ def test_module_entry_point(pair) -> None:
         env=env,
         check=False,
     )
-    assert res.returncode == 0 and "0.5.0" in res.stdout
+    assert res.returncode == 0 and "0.5.1" in res.stdout
 
 
 def test_presence_get_defaults_to_self(pair, capsys) -> None:
@@ -203,3 +205,72 @@ def test_generate_key_never_overwrites(tmp_path: Path) -> None:
         keys._write_new_key(d / "agent-a.key")
     assert (d / "agent-a.key").read_bytes() == before and first["fingerprint"]
     assert [p.name for p in d.iterdir()] == ["agent-a.key"]  # no temp file left behind
+
+
+def test_relay_unsigned_needs_no_config(capsys) -> None:
+    code, out, _ = run(capsys, "relay", "agent-c", "hello", "there", "--to", "agent-b", "--reply-to", "7")
+    assert code == 0
+    assert out == "<!-- telepatia-relay -->\n<!-- reply-to: 7 -->\n**from: agent-c**\nto: agent-b\n\nhello there\n"
+
+
+def test_relay_sign_and_verify_text_once(pair, capsys, tmp_path: Path) -> None:
+    a, b = pair
+    code, out, _ = run(capsys, "relay", "agent-c", "wake", "--sign", "--config", str(a.path))
+    assert code == 0
+    _, sig = signing.split_signature(out)
+    assert sig is not None and sig.group("from") == "agent-a"
+    f = tmp_path / "relay.txt"
+    f.write_text(out)
+    ts = sig.group("ts")
+    argv = ["verify-text", str(f), "--receive-time", ts, "--config", str(b.path), "--json"]
+    code, dry, _ = run(capsys, *argv, "--dry-run")
+    info = json.loads(dry)
+    assert code == 0 and info["status"] == "verified" and info["claimed"] is False and info["dry_run"] is True
+    assert info["relay_origin"] == "agent-c" and info["content"] == "wake"
+    code, real, _ = run(capsys, *argv)
+    assert code == 0 and json.loads(real)["claimed"] is True
+    assert mode(inbox.state_dir(b.spool, "agent-b") / cli.CHANNEL_LEDGER_FILE) == 0o600
+    code, again, _ = run(capsys, *argv)
+    assert code == cli.EXIT_REJECTED and json.loads(again)["status"] == "replayed_nonce"
+    assert "content" not in json.loads(again)
+
+
+def test_verify_text_stdin_iso_time_and_errors(pair, capsys, monkeypatch, tmp_path: Path) -> None:
+    import io
+
+    a, b = pair
+    text = signing.sign_text("plain\n", "agent-a", a.signing_key())
+    _, sig = signing.split_signature(text)
+    assert sig is not None
+    iso = datetime.fromtimestamp(int(sig.group("ts")), UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
+    ledger = tmp_path / "ledger-dir"
+    ledger.mkdir(mode=0o700)
+    monkeypatch.setattr(sys, "stdin", io.TextIOWrapper(io.BytesIO(text.encode())))
+    code, out, _ = run(
+        capsys, "verify-text", "--receive-time", iso, "--ledger", str(ledger / "l.json"), "--config", str(b.path)
+    )
+    assert code == 0 and "status: verified" in out and "content: plain" in out
+    for bad_time in ("soon", "nan", "inf"):
+        code, _, err = run(capsys, "verify-text", "--receive-time", bad_time, "--config", str(b.path))
+        assert code == cli.EXIT_USAGE and "receive-time" in err
+    bad = tmp_path / "bad.bin"
+    bad.write_bytes(b"\xff\xfe")
+    code, out, _ = run(capsys, "verify-text", str(bad), "--receive-time", "0", "--config", str(b.path), "--json")
+    assert code == cli.EXIT_REJECTED and json.loads(out)["status"] == "malformed"
+    corrupt = ledger / "c.json"
+    corrupt.write_text("nope")
+    os.chmod(corrupt, 0o600)
+    f = tmp_path / "t.txt"
+    f.write_text(text)
+    code, _, err = run(
+        capsys,
+        "verify-text",
+        str(f),
+        "--receive-time",
+        sig.group("ts"),
+        "--ledger",
+        str(corrupt),
+        "--config",
+        str(b.path),
+    )
+    assert code == 1 and "ledger_corrupt" in err

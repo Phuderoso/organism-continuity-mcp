@@ -4,7 +4,7 @@ Local, dependency-free building blocks that let two or more AI agents (or any pr
 working across restarts, context compaction and session boundaries: authenticated messages
 between agents, a persistent outbox with presence hints, and a two-session handoff format.
 
-Version **0.5.0**. Python 3.10+, standard library only. Everything runs locally: no hosted
+Version **0.5.1**. Python 3.10+, standard library only. Everything runs locally: no hosted
 service, no telemetry.
 
 ## What it solves
@@ -119,13 +119,14 @@ $ echo $?
 
 `examples/telepatia/demo.sh` runs a similar flow end to end in a temp directory.
 `telepatia --help` lists every command (`presence`, `outbox`, `key rotate`, `peer remove`,
-`doctor`, ...); session handoff has its own command, `telepatia-handoff`.
+`doctor`, `relay`, `verify-text`, ...); session handoff has its own command, `telepatia-handoff`.
 
 ## Modules
 
 | Module | Status | Purpose |
 |--------|--------|---------|
 | `organism_continuity.telepatia` (signing, inbox, outbox, presence, keys) | v0.5, new | Signed `telepatia-sig v=1` messages over a file spool; persistent outbox; advisory presence; key init, rotation and revocation. |
+| `organism_continuity.telepatia` (channel, ledger, relay) | v0.5.1, new | Verify signed texts from other transports once, against the transport's receive time, with a fail-closed replay ledger and a read-only dry run; relay bodies with opt-in signing by the relayer. |
 | `organism_continuity.handoff` (command `telepatia-handoff`) | v0.5 | Package work from a long session for a fresh one; absorbs the former `agent-dual-lane-handoff` project. Reuses the kit's signing for `--notify`. |
 | Preflight, doctor, funnel and other helper-dependent tools | removed from v0.5 | Archived in `quarantine/second-batch/` (they need host helper scripts this repository does not ship, or expose a port); they return only with tests. |
 | Continuity calculator (`tools/continuity_survival_calc.py`) | stable | When a durable write is worth its cost. |
