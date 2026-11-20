@@ -4,7 +4,7 @@ Local, dependency-free building blocks that let two or more AI agents (or any pr
 working across restarts, context compaction and session boundaries: authenticated messages
 between agents, a persistent outbox with presence hints, and a two-session handoff format.
 
-Version **0.5.0**. Python 3.10+, standard library only. Everything runs locally: no hosted
+Version **0.5.1**. Python 3.10+, standard library only. Everything runs locally: no hosted
 service, no telemetry.
 
 ## What it solves

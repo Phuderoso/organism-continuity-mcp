@@ -24,7 +24,7 @@ from organism_continuity.handoff.core import (
     status,
 )
 
-__version__ = "0.5.0"
+__version__ = "0.5.1"
 
 __all__ = [
     "ID_RE",

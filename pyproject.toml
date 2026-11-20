@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "organism-continuity"
-version = "0.5.0"
+version = "0.5.1"
 description = "Open multi-agent continuity tools: signed telepatia messaging and session handoff."
 readme = "docs/TELEPATIA.md"
 requires-python = ">=3.10"

@@ -161,7 +161,7 @@ def test_module_entry_point(pair) -> None:
         env=env,
         check=False,
     )
-    assert res.returncode == 0 and "0.5.0" in res.stdout
+    assert res.returncode == 0 and "0.5.1" in res.stdout
 
 
 def test_presence_get_defaults_to_self(pair, capsys) -> None:
