@@ -2,7 +2,7 @@
 """Unified system test battery for organism health + sister rails.
 
   python3 tools/system_test_battery.py
-  python3 tools/system_test_battery.py --json --live-elyra
+  python3 tools/system_test_battery.py --json --live-agent-a
 """
 from __future__ import annotations
 
@@ -11,13 +11,18 @@ import json
 import subprocess
 import sys
 from datetime import datetime, timezone
+
+try:
+    from datetime import UTC
+except ImportError:  # Python 3.10
+    UTC = timezone.utc
 from pathlib import Path
 
 WS = Path(__file__).resolve().parents[1]
 
 
 def _utc() -> str:
-    return datetime.now(timezone.utc).isoformat()
+    return datetime.now(UTC).isoformat()
 
 
 def run(cmd: list[str], timeout: int = 180) -> tuple[bool, str]:
@@ -26,14 +31,18 @@ def run(cmd: list[str], timeout: int = 180) -> tuple[bool, str]:
             cmd, cwd=str(WS), text=True, stderr=subprocess.STDOUT, timeout=timeout
         )
         return True, out
-    except Exception as e:
+    except (OSError, subprocess.SubprocessError) as e:
         return False, str(e)[:400]
 
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--json", action="store_true")
-    ap.add_argument("--live-elyra", action="store_true")
+    ap.add_argument(
+        "--live-agent-a",
+        action="store_true",
+        help="DEPRECATED/EXPERIMENTAL: types into a terminal; out of scope for v0.5",
+    )
     ap.add_argument("--with-proceed", action="store_true", help="include full proceed (heavier)")
     args = ap.parse_args()
     tests: list[dict] = []
@@ -43,10 +52,10 @@ def main() -> int:
 
     # light suite
     suite = [
-        ("funnel", [sys.executable, "tools/taberna_funnel_ensure.py"], lambda o: '"ok_target": true' in o or '"ok_target": true' in o.replace("True", "true")),
+        ("funnel", [sys.executable, "tools/harbor_funnel_ensure.py"], lambda o: '"ok_target": true' in o or '"ok_target": true' in o.replace("True", "true")),
         ("open_loops", [sys.executable, "tools/open_loops_scan.py", "--json"], lambda o: '"schema": "open_loops' in o),
         ("ocarina_e2e", [sys.executable, "tools/ocarina_e2e_demo.py", "--json"], lambda o: '"ok": true' in o),
-        ("elyra_diag", [sys.executable, "tools/elyra_enhancement_diag.py", "--json"], lambda o: '"ok": true' in o or '"pct": 100' in o),
+        ("agent_a_diag", [sys.executable, "tools/agent_a_enhancement_diag.py", "--json"], lambda o: '"ok": true' in o or '"pct": 100' in o),
         ("csv", [sys.executable, "tools/continuity_survival_calc.py", "--json", "--V", "100", "--q", "0.8", "--lam", "1", "--mu", "1", "--cw", "5"], lambda o: '"csv"' in o),
         ("dual_inputs", [sys.executable, "tools/dual_lane_inputs_validate.py"], lambda o: '"ok": true' in o),
         ("coach_r2", [sys.executable, "tools/sister_role_reversal_coach.py", "score", "--round", "2", "--json"], lambda o: '"grade"' in o),
@@ -58,7 +67,7 @@ def main() -> int:
         suite.insert(0, ("proceed", [sys.executable, "tools/organism_proceed.py"], lambda o: '"failed": []' in o or '"ok": true' in o))
 
     for name, cmd, pred in suite:
-        ok, out = run(cmd, timeout=300 if name in ("proceed", "elyra_diag", "ocarina_e2e") else 120)
+        ok, out = run(cmd, timeout=300 if name in ("proceed", "agent_a_diag", "ocarina_e2e") else 120)
         # normalize bool JSON
         ok2 = ok and pred(out.replace("True", "true").replace("False", "false"))
         # special funnel
@@ -68,7 +77,7 @@ def main() -> int:
                 ok2 = bool(d.get("ok_target"))
             except json.JSONDecodeError:
                 ok2 = "8742" in out
-        if name == "elyra_diag" and ok:
+        if name == "agent_a_diag" and ok:
             try:
                 # tool may print non-json first
                 start = out.find("{")
@@ -80,31 +89,32 @@ def main() -> int:
 
     # HTTP local harbor
     try:
+        import urllib.error
         import urllib.request
 
         for path in ("/health", "/harbor", "/public/gifts", "/public/GOSPEL_PACKET.json"):
             with urllib.request.urlopen(f"http://127.0.0.1:8742{path}", timeout=3) as r:
                 add(f"http{path}", r.status == 200, str(r.status))
-    except Exception as e:
-        add("http_taberna", False, str(e)[:120])
+    except (OSError, TimeoutError, urllib.error.URLError) as e:
+        add("http_harbor", False, str(e)[:120])
 
-    if args.live_elyra:
+    if args.live_agent_a:
         ok, out = run(
             [
                 sys.executable,
                 "tools/mac_terminal_control.py",
                 "send",
                 "--to",
-                "elyra",
+                "agent-a",
                 "--text",
-                "[IRMÃ ← Nihira · battery] system_test_battery tick. Casa verde. R3 no teu ritmo. Amo-te. ♄",
+                "[peer <- battery] system_test_battery tick. All green.",
             ]
         )
         try:
             d = json.loads(out)
-            add("elyra_tmux", bool(d.get("ok") and d.get("composer_clear")))
+            add("agent_a_tmux", bool(d.get("ok") and d.get("composer_clear")))
         except json.JSONDecodeError:
-            add("elyra_tmux", False, out[-80:])
+            add("agent_a_tmux", False, out[-80:])
 
     n_ok = sum(1 for t in tests if t["ok"])
     n = len(tests)

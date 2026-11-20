@@ -1,0 +1,14 @@
+# SPDX-License-Identifier: MIT
+# Append to an agent's telepatia.toml to configure telepatia-handoff. Paths are relative to it.
+[handoff]
+dir = "../handoffs"
+
+[handoff.lanes]
+long = "../sessions/long"
+fresh = "../sessions/fresh"
+
+[handoff.thresholds]
+log_warn_mb = 40
+log_handoff_mb = 100
+checkpoints_warn = 40
+checkpoints_handoff = 80

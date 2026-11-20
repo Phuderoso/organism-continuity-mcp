@@ -1,0 +1,11 @@
+# SPDX-License-Identifier: MIT
+# Copy outside the checkout as a/telepatia.toml; generate keys with telepatia init.
+[identity]
+name = "agent-a"
+key_file = "keys/agent-a.key"
+
+[spool]
+dir = "../spool"
+
+[peers]
+file = "peers.toml"

@@ -1,0 +1,11 @@
+# SPDX-License-Identifier: MIT
+# Lint settings for the telepatia and handoff packages (scoped to this directory; ruff 0.17.6).
+line-length = 120
+target-version = "py310"
+
+[lint]
+select = ["E", "F", "W", "I", "B", "UP", "S", "SIM", "RUF"]
+ignore = ["S101", "S603", "S607", "S105", "S106", "S108", "RUF059"]
+
+[lint.isort]
+known-first-party = ["organism_continuity"]

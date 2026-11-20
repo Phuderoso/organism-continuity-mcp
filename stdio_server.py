@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Minimal MCP stdio server for organism-continuity tools (no pip SDK required).
+"""Minimal MCP stdio server for organism-continuity tools (no third-party MCP SDK required).
 
 Implements enough JSON-RPC over stdin/stdout for hosts that speak MCP tools/list
 and tools/call. Handlers reuse server.py.
@@ -24,7 +24,7 @@ from pathlib import Path
 
 # Local import
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from server import HANDLERS, TOOLS, mcp_manifest  # noqa: E402
+from server import HANDLERS, TOOLS, mcp_manifest
 
 
 def _read_message() -> dict | None:

@@ -1,24 +1,24 @@
 {
-  "comment": "Paste into Cursor/Claude MCP config. Paths are Mac-anchor defaults; adjust if workspace moves.",
+  "comment": "Paste into Cursor/Claude MCP config. Replace ${ORGANISM_HOME} with the absolute path of your workspace.",
   "mcpServers": {
     "organism-continuity": {
       "command": "python3",
       "args": [
-        "/Users/lime/.openclaw/workspace/tools/mcp_organism_continuity/stdio_server.py"
+        "${ORGANISM_HOME}/tools/mcp_organism_continuity/stdio_server.py"
       ]
     },
     "organism-power": {
       "command": "python3",
       "args": [
-        "/Users/lime/.openclaw/workspace/tools/mcp_organism_power/stdio_server.py"
+        "${ORGANISM_HOME}/tools/mcp_organism_power/stdio_server.py"
       ]
     }
   },
   "cli_smoke": [
     "python3 tools/mcp_organism_continuity/server.py list-tools",
     "python3 tools/mcp_organism_continuity/server.py call peer_starter",
-    "python3 tools/mcp_organism_continuity/server.py call funnel_ensure",
-    "python3 tools/mcp_organism_power/server.py call fts_status",
-    "python3 tools/mcp_organism_power/server.py call recall --query 'quiet_ok' --limit 5"
+    "python3 tools/mcp_organism_continuity/server.py call csv",
+    "python3 tools/mcp_organism_power/server.py list-tools",
+    "python3 tools/mcp_organism_power/server.py call csv"
   ]
 }

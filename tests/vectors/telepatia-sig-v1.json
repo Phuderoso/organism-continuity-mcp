@@ -1,0 +1,124 @@
+{
+  "description": "telepatia-sig v=1 test vectors. TEST KEY ONLY: never use it for anything else.",
+  "test_key_hex": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+  "keyring": {
+    "agent-a": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f"
+  },
+  "recipient": "agent-b",
+  "default_transport_time": 1700000000,
+  "positive_note": "Only positive[0] is a complete spool message accepted by a reader. positive[1..3] exercise only the MAC and canonical form; as messages the spool reader returns malformed.",
+  "positive": [
+    {
+      "input_text": "to: agent-b\nfrom: agent-a\n\nhello, synthetic test vector\n",
+      "signer": "agent-a",
+      "base_key": "agent-a",
+      "ts": 1700000000,
+      "nonce": "00112233445566778899aabbccddeeff",
+      "content": "to: agent-b\nfrom: agent-a\n\nhello, synthetic test vector\n",
+      "content_sha256": "64b83f11a483c1a5ce1f72d392e497adcba0dffafea2bea471d09c313725ca83",
+      "canonical": "telepatia-sig/v1\nagent-a\n1700000000\n00112233445566778899aabbccddeeff\n64b83f11a483c1a5ce1f72d392e497adcba0dffafea2bea471d09c313725ca83",
+      "mac": "ee31e8717c8a8322d964c9c00f7088cc8e8042d28a057a95b750202f3650d1c2",
+      "signed_text": "to: agent-b\nfrom: agent-a\n\nhello, synthetic test vector\n<!-- telepatia-sig v=1 from=agent-a ts=1700000000 nonce=00112233445566778899aabbccddeeff mac=ee31e8717c8a8322d964c9c00f7088cc8e8042d28a057a95b750202f3650d1c2 -->\n"
+    },
+    {
+      "input_text": "plain canal text without headers",
+      "signer": "agent-a",
+      "base_key": "agent-a",
+      "ts": 1700000600,
+      "nonce": "ffeeddccbbaa99887766554433221100",
+      "content": "plain canal text without headers\n",
+      "content_sha256": "d04050cf694eb90306112bf05d48ae99dce1bd87d28db1b34e549fc2159a73cb",
+      "canonical": "telepatia-sig/v1\nagent-a\n1700000600\nffeeddccbbaa99887766554433221100\nd04050cf694eb90306112bf05d48ae99dce1bd87d28db1b34e549fc2159a73cb",
+      "mac": "af057c40ec6515863513f5d2c68d17107b2bb1e6837e65c6e796a68747965594",
+      "signed_text": "plain canal text without headers\n<!-- telepatia-sig v=1 from=agent-a ts=1700000600 nonce=ffeeddccbbaa99887766554433221100 mac=af057c40ec6515863513f5d2c68d17107b2bb1e6837e65c6e796a68747965594 -->\n"
+    },
+    {
+      "input_text": "multi\nline\n\nbody\n\n",
+      "signer": "agent-b",
+      "base_key": "agent-b",
+      "ts": 0,
+      "nonce": "0123456789abcdef",
+      "content": "multi\nline\n\nbody\n\n",
+      "content_sha256": "e95fab2960c7e74501410cb9d7214246a96ae091a0d1264a7d7935f765d8156c",
+      "canonical": "telepatia-sig/v1\nagent-b\n0\n0123456789abcdef\ne95fab2960c7e74501410cb9d7214246a96ae091a0d1264a7d7935f765d8156c",
+      "mac": "f47fb0ef75876bf64302e7eeb6b6ec5b23fc7a92052ba1920c58d0adbc38710f",
+      "signed_text": "multi\nline\n\nbody\n\n<!-- telepatia-sig v=1 from=agent-b ts=0 nonce=0123456789abcdef mac=f47fb0ef75876bf64302e7eeb6b6ec5b23fc7a92052ba1920c58d0adbc38710f -->\n"
+    },
+    {
+      "input_text": "unicode: café ✓\n",
+      "signer": "Agent-A[tag]",
+      "base_key": "agent-a",
+      "ts": 123456789012,
+      "nonce": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "content": "unicode: café ✓\n",
+      "content_sha256": "db2de6eba5e117354032a720d6272ba5753a35d2ba7af5d827ca0ae0239ea972",
+      "canonical": "telepatia-sig/v1\nagent-a\n123456789012\naaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\ndb2de6eba5e117354032a720d6272ba5753a35d2ba7af5d827ca0ae0239ea972",
+      "mac": "ed8ad75ecebd37c11ce0071b6c7e443d143fdfd9917a168ae53a015d2a45d196",
+      "signed_text": "unicode: café ✓\n<!-- telepatia-sig v=1 from=Agent-A[tag] ts=123456789012 nonce=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa mac=ed8ad75ecebd37c11ce0071b6c7e443d143fdfd9917a168ae53a015d2a45d196 -->\n"
+    }
+  ],
+  "negative": [
+    {
+      "reason": "unsigned",
+      "text": "to: agent-b\nfrom: agent-a\n\nno trailer\n"
+    },
+    {
+      "reason": "malformed",
+      "note": "ts with a leading zero (canal-valid, same MAC, refused by the spool profile)",
+      "text": "to: agent-b\nfrom: agent-a\n\nhello, synthetic test vector\n<!-- telepatia-sig v=1 from=agent-a ts=01700000000 nonce=00112233445566778899aabbccddeeff mac=ee31e8717c8a8322d964c9c00f7088cc8e8042d28a057a95b750202f3650d1c2 -->\n"
+    },
+    {
+      "reason": "malformed",
+      "note": "non-canonical signer spelling (same base_key, same MAC)",
+      "text": "to: agent-b\nfrom: agent-a\n\nhello, synthetic test vector\n<!-- telepatia-sig v=1 from=AGENT-A ts=1700000000 nonce=00112233445566778899aabbccddeeff mac=ee31e8717c8a8322d964c9c00f7088cc8e8042d28a057a95b750202f3650d1c2 -->\n"
+    },
+    {
+      "reason": "malformed",
+      "note": "missing to:/from: header profile",
+      "text": "hello\n<!-- telepatia-sig v=1 from=agent-a ts=1700000000 nonce=00112233445566778899aabbccddeeff mac=0b7efc378baf3556d1a241a101b578f443ec7e12844ad6233bb281ae76cb17ef -->\n"
+    },
+    {
+      "reason": "unknown_key",
+      "note": "signer not in keyring",
+      "text": "to: agent-b\nfrom: agent-c\n\nx\n<!-- telepatia-sig v=1 from=agent-c ts=1700000000 nonce=11111111111111111111111111111111 mac=da53d3eb9efb1e0471673f4f6b900d920358c81b5e45a7f19bd61b2c395a0b79 -->\n"
+    },
+    {
+      "reason": "bad_mac",
+      "note": "body edited after signing",
+      "text": "to: agent-b\nfrom: agent-a\n\nHELLO, synthetic test vector\n<!-- telepatia-sig v=1 from=agent-a ts=1700000000 nonce=00112233445566778899aabbccddeeff mac=ee31e8717c8a8322d964c9c00f7088cc8e8042d28a057a95b750202f3650d1c2 -->\n"
+    },
+    {
+      "reason": "bad_mac",
+      "note": "LF rewritten as CRLF (no normalization)",
+      "text": "to: agent-b\nfrom: agent-a\n\nline1\r\nline2\n<!-- telepatia-sig v=1 from=agent-a ts=1700000000 nonce=44444444444444444444444444444444 mac=267dfa31017c003d6441ce9d96367deb4ac08a2486bf2fb24cf1d7f97be709d9 -->\n"
+    },
+    {
+      "reason": "sender_mismatch",
+      "note": "from: header says agent-c, trailer signed by agent-a",
+      "text": "to: agent-b\nfrom: agent-c\n\nx\n<!-- telepatia-sig v=1 from=agent-a ts=1700000000 nonce=22222222222222222222222222222222 mac=6640769555f1949055c4f7db980dc7259e5fb781c12039072d6be8a3a5027728 -->\n"
+    },
+    {
+      "reason": "wrong_recipient",
+      "note": "addressed to agent-c",
+      "text": "to: agent-c\nfrom: agent-a\n\nx\n<!-- telepatia-sig v=1 from=agent-a ts=1700000000 nonce=33333333333333333333333333333333 mac=0fa323dda6d75022afc12cfe0b7fcbe0d2534ff18b6ebe19933812a02f277ee7 -->\n"
+    },
+    {
+      "reason": "stale",
+      "note": "transport time 601 s after ts",
+      "text": "to: agent-b\nfrom: agent-a\n\nhello, synthetic test vector\n<!-- telepatia-sig v=1 from=agent-a ts=1700000000 nonce=00112233445566778899aabbccddeeff mac=ee31e8717c8a8322d964c9c00f7088cc8e8042d28a057a95b750202f3650d1c2 -->\n",
+      "transport_time": 1700000601
+    },
+    {
+      "reason": "stale",
+      "note": "transport time 601 s before ts",
+      "text": "to: agent-b\nfrom: agent-a\n\nhello, synthetic test vector\n<!-- telepatia-sig v=1 from=agent-a ts=1700000000 nonce=00112233445566778899aabbccddeeff mac=ee31e8717c8a8322d964c9c00f7088cc8e8042d28a057a95b750202f3650d1c2 -->\n",
+      "transport_time": 1699999399
+    },
+    {
+      "reason": "replayed_nonce",
+      "note": "nonce already in the store",
+      "text": "to: agent-b\nfrom: agent-a\n\nhello, synthetic test vector\n<!-- telepatia-sig v=1 from=agent-a ts=1700000000 nonce=00112233445566778899aabbccddeeff mac=ee31e8717c8a8322d964c9c00f7088cc8e8042d28a057a95b750202f3650d1c2 -->\n",
+      "seen": true
+    }
+  ]
+}
