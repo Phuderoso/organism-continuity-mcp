@@ -9,7 +9,12 @@ freshness check, so a replay inside that horizon is refused.
 
 File format (a regular ``0600`` file in a directory that only its owner can write)::
 
-    {"v": 1, "nonces": {"<base_key>:<nonce>": <expiry epoch>, ...}}
+    {"v": 1, "nonces": {"<base_key>:<nonce>": <expiry epoch>, ...}, "watermark": <epoch>}
+
+``watermark`` (optional; ledgers written by 0.5.1 have none) is the highest prune horizon ever used: every
+entry whose expiry was below it may have been forgotten. Verifiers refuse a text whose own
+expiry is below the watermark, so a backward clock step after a prune cannot re-admit a
+forgotten nonce.
 
 It **fails closed**: a ledger that is a symlink, not a regular file, owned by someone else,
 readable or writable by group/other, larger than ``MAX_LEDGER_BYTES``, not valid JSON (including
@@ -82,11 +87,11 @@ def _valid_expiry(value: object) -> bool:
     return isinstance(value, (int, float)) and not isinstance(value, bool) and math.isfinite(value)
 
 
-def _load(path: Path) -> dict[str, float]:
+def _load(path: Path) -> tuple[dict[str, float], float]:
     try:
         fd = _open_private(path, os.O_RDONLY)
     except FileNotFoundError:
-        return {}
+        return {}, -math.inf
     with os.fdopen(fd, "rb") as stream:
         if os.fstat(stream.fileno()).st_size > MAX_LEDGER_BYTES:
             raise ReplayLedgerError(f"ledger_too_large: {path}")
@@ -101,12 +106,14 @@ def _load(path: Path) -> dict[str, float]:
     if (
         not isinstance(obj, dict)
         or obj.get("v") != LEDGER_VERSION
-        or set(obj) != {"v", "nonces"}
+        or set(obj) - {"watermark"} != {"v", "nonces"}
+        or ("watermark" in obj and not _valid_expiry(obj["watermark"]))
         or not isinstance(records, dict)
         or not all(isinstance(k, str) and _valid_expiry(v) for k, v in records.items())
     ):
         raise ReplayLedgerError(f"ledger_corrupt: {path}")
-    return {k: float(v) for k, v in records.items()}
+    watermark = float(obj["watermark"]) if "watermark" in obj else -math.inf
+    return {k: float(v) for k, v in records.items()}, watermark
 
 
 @dataclass
@@ -115,12 +122,17 @@ class LedgerView:
 
     records: dict[str, float]
     writable: bool
+    watermark: float = -math.inf
     dirty: bool = False
     claimed: list[str] = field(default_factory=list)
 
     def seen(self, key: str) -> bool:
         """True when ``key`` was already claimed and has not been pruned."""
         return key in self.records
+
+    def forgotten(self, expires_at: float) -> bool:
+        """True when an entry expiring at ``expires_at`` may already have been pruned."""
+        return expires_at < self.watermark
 
     def claim(self, key: str, expires_at: float) -> None:
         """Record ``key`` as used until ``expires_at`` (saved when the transaction ends)."""
@@ -145,7 +157,8 @@ class ReplayLedger:
         """Lock, load, yield a :class:`LedgerView`, then (when ``write``) prune and save.
 
         Pruning uses the local ``clock`` (default ``time.time()``), never a transport-supplied
-        time, and drops only entries more than ``KEEP_AFTER_EXPIRY_S`` past their expiry.
+        time, and drops only entries more than ``KEEP_AFTER_EXPIRY_S`` past their expiry. The
+        prune horizon is saved as ``watermark`` and never decreases.
         Errors raised inside the block propagate and nothing is saved.
         """
         clock = time.time() if clock is None else clock
@@ -162,12 +175,15 @@ class ReplayLedger:
         try:
             if lock_fd >= 0:
                 fcntl.flock(lock_fd, fcntl.LOCK_EX if write else fcntl.LOCK_SH)
-            view = LedgerView(_load(self.path), writable=write)
+            records, watermark = _load(self.path)
+            view = LedgerView(records, writable=write, watermark=watermark)
             yield view
             if write and view.dirty:
-                horizon = clock - KEEP_AFTER_EXPIRY_S
+                # never lower the watermark, even if the clock stepped back
+                horizon = max(clock - KEEP_AFTER_EXPIRY_S, watermark)
                 kept = {k: v for k, v in view.records.items() if v >= horizon}
-                data = (json.dumps({"v": LEDGER_VERSION, "nonces": kept}, sort_keys=True) + "\n").encode()
+                payload = {"v": LEDGER_VERSION, "nonces": kept, "watermark": horizon}
+                data = (json.dumps(payload, sort_keys=True) + "\n").encode()
                 if len(data) > MAX_LEDGER_BYTES:
                     raise ReplayLedgerError(f"ledger_full: {self.path}")
                 try:

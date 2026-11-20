@@ -88,6 +88,9 @@ confidentiality, the storage or transport must provide it.
   pruned in the meantime are forgotten, and a copy of an old message that preserves its original
   mtime could be accepted again while it is still inside the 7-day retention. Keep the host clock
   monotonic (NTP slewing, not stepping) on readers.
+  The replay ledger for non-spool texts (`channel` / `ledger`, since 0.5.1) is not exposed to this:
+  it keeps a prune `watermark` that never decreases and refuses as `stale` any text whose expiry
+  is below it, so a backward clock step after a prune cannot re-admit a forgotten nonce.
 - **`inbox --peek`** returns verified messages without recording their nonces or moving them, so
   the same message is returned on every peek. It does not consume nonces, but callers must not act
   on peeked messages; act only on a normal (consuming) read.

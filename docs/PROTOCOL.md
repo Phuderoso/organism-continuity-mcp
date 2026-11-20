@@ -283,15 +283,20 @@ Verification of such a text (`channel.verify_text`), in this order:
 4. `stale` when `|T - ts| > 600`, when `T` is more than 7 days older than the verifier's clock,
    or when `T` is more than 600 s ahead of it.
 5. The nonce is checked and claimed in a replay ledger under one exclusive lock
-   (`replayed_nonce` when already present). Only after this step is the text `verified`.
+   (`replayed_nonce` when already present; `stale` when `ts + 600` is below the ledger's
+   `watermark`). Only after this step is the text `verified`.
 
-Replay ledger: `{"v": 1, "nonces": {"<base_key>:<nonce>": <ts + 600>}}`, a regular `0600` file
+Replay ledger: `{"v": 1, "nonces": {"<base_key>:<nonce>": <ts + 600>}, "watermark": <epoch>}`
+(`watermark` optional; files without it are read as having none), a regular `0600` file
 of at most 4 MiB in a directory not writable by group or other, never followed through a
 symlink. Any deviation (symlink, special file, other owner, group/other permission bits,
 oversize, invalid or deeply nested JSON, non-finite values, extra keys) is an error and the
 verifier MUST NOT act on the text (fail closed). Entries are pruned against the verifier's own
 clock, never the transport's, and only once they are more than 7 days past expiry, which is
-the same bound as the receive-time check in step 4, so a pruned entry can never be replayed.
+the same bound as the receive-time check in step 4, so a pruned entry cannot be replayed while
+the clock only moves forward. Caveat: if the clock steps back by more than that margin after a
+prune, step 4 alone would re-admit a forgotten nonce; the `watermark` (the highest prune horizon
+ever used, never lowered) closes this, because a text whose `ts + 600` is below it is `stale`.
 
 Dry run: all checks run against a shared-locked, read-only view of the ledger. Nothing is
 created or claimed, so a text that was only checked can still be verified for real once. A
