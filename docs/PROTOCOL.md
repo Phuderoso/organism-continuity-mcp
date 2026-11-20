@@ -4,7 +4,7 @@ Status: normative for telepatia-kit 0.5.x. Protocol version: `v=1` (domain `tele
 
 The key words MUST, MUST NOT, SHOULD and MAY are used as in RFC 2119. An implementation in
 another language that follows sections 2 to 8 interoperates with this kit. The test vectors in
-section 13 (and `tests/vectors/telepatia-sig-v1.json`) are part of this specification.
+section 15 (and `tests/vectors/telepatia-sig-v1.json`) are part of this specification.
 
 ## 1. Scope: which format is v0.5
 
@@ -267,7 +267,54 @@ the canonical form. A verifier MUST treat any other `v` as `unsigned`. A future 
 to: bind the recipient and transport context (for example the channel identifier) into the MAC,
 carry a key id to allow overlapping rotation, and sign the literal canonical `ts` string.
 
-## 14. Test vectors
+## 14. Other transports and relays (0.5.1)
+
+This section applies the same trailer to texts that do not travel over the spool (for example
+comments on a code-hosting service, wake requests, relayed texts). Reference implementation:
+`organism_continuity.telepatia.channel`, `.ledger` and `.relay`.
+
+Verification of such a text (`channel.verify_text`), in this order:
+
+1. The receive time `T` MUST be supplied by the transport and MUST be a finite number;
+   otherwise the call fails before any other check. The signed `ts` is never the clock.
+2. Grammar as in section 2 (any content; no spool profile, no recipient check). Missing trailer:
+   `unsigned`. Text over 64 KiB: `too_large`. Not UTF-8 encodable: `malformed`.
+3. Key lookup by `base_key(from)` (`unknown_key`), constant-time MAC compare (`bad_mac`).
+4. `stale` when `|T - ts| > 600`, when `T` is more than 7 days older than the verifier's clock,
+   or when `T` is more than 600 s ahead of it.
+5. The nonce is checked and claimed in a replay ledger under one exclusive lock
+   (`replayed_nonce` when already present). Only after this step is the text `verified`.
+
+Replay ledger: `{"v": 1, "nonces": {"<base_key>:<nonce>": <ts + 600>}}`, a regular `0600` file
+of at most 4 MiB in a directory not writable by group or other, never followed through a
+symlink. Any deviation (symlink, special file, other owner, group/other permission bits,
+oversize, invalid or deeply nested JSON, non-finite values, extra keys) is an error and the
+verifier MUST NOT act on the text (fail closed). Entries are pruned against the verifier's own
+clock, never the transport's, and only once they are more than 7 days past expiry, which is
+the same bound as the receive-time check in step 4, so a pruned entry can never be replayed.
+
+Dry run: all checks run against a shared-locked, read-only view of the ledger. Nothing is
+created or claimed, so a text that was only checked can still be verified for real once. A
+caller that defers acting on a text SHOULD dry-run first and claim only when it acts.
+
+Relay body (`relay.format_relay`):
+
+```
+<!-- telepatia-relay -->
+<!-- reply-to: <id> -->        (optional)
+**from: <origin>**
+to: <recipient>                (optional)
+
+<message>
+```
+
+A relay is unsigned unless the caller opts in for that call. A signed relay carries an
+ordinary `telepatia-sig v=1` trailer made by the **relayer** with the relayer's key, so a
+verifier learns that the relayer vouched for it; the `from:` line is informational and MUST NOT
+grant the origin's authority. A message that already ends in a trailer is refused when the relay
+body is built, so it cannot pass for the origin's own signature.
+
+## 15. Test vectors
 
 TEST KEY (for test vectors only, public, never use it for anything else):
 `000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f`

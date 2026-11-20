@@ -170,9 +170,12 @@ All commands accept `--config PATH` and `--json`.
 | `telepatia peer add NAME --key-file F` / `remove NAME` / `list` | Manage peers; `list` shows fingerprints. |
 | `telepatia key fingerprint\|rotate\|revoke [NAME] [--yes]` | Key lifecycle. Never prints key material. |
 | `telepatia-handoff status\|package\|absorb\|pending` | Session handoff packages (separate command and package), see `docs/HANDOFF.md`. |
+| `telepatia relay ORIGIN TEXT... [--to N] [--reply-to ID] [--sign]` | Print a relay body for ORIGIN to stdout. Unsigned unless `--sign`; `--sign` signs as this agent (the relayer) with its own key and needs `--config`. |
+| `telepatia verify-text [FILE] --receive-time T [--ledger F] [--dry-run]` | Verify a signed text from another transport (stdin by default) against the transport's receive time `T` (epoch or ISO-8601), claiming its nonce once in a replay ledger (default `<spool>/state/<name>/channel-ledger.json`). `--dry-run` checks with a read-only ledger and claims nothing. Prints the content only when verified; exit 4 when rejected. |
 | `telepatia doctor` | Check keys, peer keys and directory modes. |
 
-Exit codes: 0 success, 1 error (message on stderr), 2 usage, 3 inbox empty.
+Exit codes: 0 success, 1 error (message on stderr), 2 usage, 3 inbox empty, 4 text rejected
+(`verify-text`).
 
 ## Security notes
 

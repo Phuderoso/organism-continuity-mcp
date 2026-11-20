@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import os
 import shutil
 import sys
@@ -16,7 +17,7 @@ from collections.abc import Sequence
 from datetime import datetime
 from pathlib import Path
 
-from organism_continuity.telepatia import __version__, inbox, keys, outbox, presence
+from organism_continuity.telepatia import __version__, channel, inbox, keys, outbox, presence, relay
 from organism_continuity.telepatia._compat import UTC, tomllib
 from organism_continuity.telepatia.config import (
     Config,
@@ -29,12 +30,16 @@ from organism_continuity.telepatia.config import (
 )
 from organism_continuity.telepatia.events import EventsUnavailable
 from organism_continuity.telepatia.keys import KeyFileError
+from organism_continuity.telepatia.ledger import ReplayLedger, ReplayLedgerError
 from organism_continuity.telepatia.storage import UnsafePath, atomic_write, private_dir
 
 EXIT_OK = 0
 EXIT_ERROR = 1
 EXIT_USAGE = 2
 EXIT_EMPTY = 3
+EXIT_REJECTED = 4
+
+CHANNEL_LEDGER_FILE = "channel-ledger.json"
 
 
 def _out(obj: object, as_json: bool) -> None:
@@ -171,6 +176,75 @@ def cmd_chama(args: argparse.Namespace) -> int:
         return EXIT_OK
     _out({"delivered": msg.id, "to": to}, args.json)
     return EXIT_OK
+
+
+def cmd_relay(args: argparse.Namespace) -> int:
+    """Print a relay body for ORIGIN. Unsigned unless ``--sign`` (then signed as our own name)."""
+    text = " ".join(args.text)
+    if not args.sign:
+        sys.stdout.write(relay.relay_text(args.origin, text, to=args.to or "", reply_to=args.reply_to))
+        return EXIT_OK
+    cfg = _cfg(args)
+    body = relay.relay_text(
+        args.origin,
+        text,
+        to=args.to or "",
+        reply_to=args.reply_to,
+        sign=True,
+        relayer=cfg.name,
+        key=cfg.signing_key(),
+    )
+    sys.stdout.write(body)
+    return EXIT_OK
+
+
+def cmd_verify_text(args: argparse.Namespace) -> int:
+    """Verify a signed text from another transport against its receive time, once."""
+    cfg = _cfg(args)
+    try:
+        receive_time: float | None = float(args.receive_time)
+    except ValueError:
+        receive_time = presence.parse_ts(args.receive_time)
+    if receive_time is not None and not math.isfinite(receive_time):
+        receive_time = None
+    if receive_time is None:
+        print("verify-text: --receive-time must be epoch seconds or ISO-8601", file=sys.stderr)
+        return EXIT_USAGE
+    if args.file in (None, "-"):
+        raw = sys.stdin.buffer.read(channel.MAX_TEXT_BYTES + 1)
+    else:
+        with open(keys.expand(args.file), "rb") as fh:
+            raw = fh.read(channel.MAX_TEXT_BYTES + 1)
+    try:
+        text = raw.decode("utf-8")
+    except UnicodeDecodeError:
+        text = None
+    ledger_path = (
+        keys.expand(args.ledger) if args.ledger else inbox.state_dir(cfg.spool, cfg.name) / CHANNEL_LEDGER_FILE
+    )
+    if text is None:
+        res = channel.ChannelCheck("malformed", dry_run=args.dry_run)
+    else:
+        res = channel.verify_text(
+            text,
+            keyring=cfg.keyring(),
+            receive_time=receive_time,
+            ledger=ReplayLedger(ledger_path),
+            dry_run=args.dry_run,
+        )
+    out: dict[str, object] = {
+        "status": res.status,
+        "signer": res.signer,
+        "ts": res.ts,
+        "claimed": res.claimed,
+        "dry_run": res.dry_run,
+    }
+    if res.relay is not None:
+        out["relay_origin"] = res.relay.origin
+    if res.verified:
+        out["content"] = res.relay.message if res.relay is not None else res.content
+    _out(out, args.json)
+    return EXIT_OK if res.verified else EXIT_REJECTED
 
 
 def _print_messages(res: inbox.ReadResult, as_json: bool) -> None:
@@ -344,6 +418,21 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("--timeout", type=float, default=None, help="with run: give up after N seconds")
     s.set_defaults(func=cmd_outbox)
 
+    s = sub.add_parser("relay", parents=[common], help="print a relay body for another agent (unsigned unless --sign)")
+    s.add_argument("origin", help="who the relayed message is from")
+    s.add_argument("text", nargs="+")
+    s.add_argument("--to", default=None, help="recipient line")
+    s.add_argument("--reply-to", dest="reply_to", type=int, default=None, metavar="ID")
+    s.add_argument("--sign", action="store_true", help="opt-in: sign with our own key (needs --config)")
+    s.set_defaults(func=cmd_relay)
+
+    s = sub.add_parser("verify-text", parents=[common], help="verify a signed text from another transport, once")
+    s.add_argument("file", nargs="?", help="text file (default: stdin)")
+    s.add_argument("--receive-time", required=True, help="transport receive time (epoch seconds or ISO-8601)")
+    s.add_argument("--ledger", help="replay ledger (default: <spool>/state/<name>/channel-ledger.json)")
+    s.add_argument("--dry-run", action="store_true", help="check only; read-only ledger, claims nothing")
+    s.set_defaults(func=cmd_verify_text)
+
     s = sub.add_parser("doctor", parents=[common], help="check file modes and keys")
     s.set_defaults(func=cmd_doctor)
     return p
@@ -362,6 +451,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         EventsUnavailable,
         inbox.PeerInboxMissing,
         inbox.NonceStoreError,
+        ReplayLedgerError,
         FileExistsError,
         FileNotFoundError,
         ValueError,
