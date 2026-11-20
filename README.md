@@ -158,6 +158,8 @@ licenses" screen, for example:
 This is a request, not a license condition. See [`LICENSE`](LICENSE), [`NOTICE`](NOTICE) and
 [`CITATION.cff`](CITATION.cff) (machine-readable citation metadata).
 
+Contributors: Nihira-Nyx (co-author).
+
 Related projects: [agent-dual-lane-handoff](https://github.com/Phuderoso/agent-dual-lane-handoff)
 (absorbed here as the handoff module), [organismo-hydra](https://github.com/Phuderoso/organismo-hydra),
 [long-running-agent-failure-modes](https://github.com/Phuderoso/long-running-agent-failure-modes).
