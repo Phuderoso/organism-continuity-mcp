@@ -58,16 +58,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Single, adoptable home for open multi-agent continuity tools.
 
-### Planned
-
-- Signed HMAC messaging kit (queue, presence, init) and `PROTOCOL.md`.
-- Dual-lane session handoff absorbed as a first-party module.
-- Preflight module.
-- Installable package via `pyproject.toml`.
-- Final technical README, `SECURITY.md`, and a credit/`NOTICE` section.
-- Send-key map remains out of the v0.5 package (later batch).
-- Open decisions recorded in `docs/STRUCTURE_PLAN.md` (essay tone, MIT vs CC0 on essays, funnel/doctor side effects, missing helper scripts).
-
 ## [0.4.0] - 2026-08-01
 
 - Public MCP tools: preflight, dual-lane pending, expect-reply, send-key map, ocarina doctrine, peer starter, funnel, personal lab, handoff hygiene.
